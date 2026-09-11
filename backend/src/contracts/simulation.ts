@@ -9,6 +9,7 @@ export type SimulationStatus =
 export interface SimulationState {
   sessionId: string;
   ownerId: string;
+  relatedConversationId?: string;
   jobId: string;
   variantId?: string;
   worldTitle?: string;

@@ -261,7 +261,11 @@ app.post("/users/:requestedUserId/preferences", async (request, response) => {
       const matches = [...job.standardTasks, ...job.skills, ...job.knowledge].filter((value) => text.includes(value.toLowerCase()));
       return { jobId: job.jobId, score: Math.min(100, 50 + matches.length * 10), reasons: matches.length ? matches.map((value) => `${value} 연관`) : ["직무 프로필 기반 탐색"] };
     }).sort((left, right) => right.score - left.score);
-    const match: JobMatch = { matchId: randomUUID(), inputSnapshot: { rawText: String(rawText), interestActivities: preferences.interestActivities }, candidates, matchingLogicVersion: "1.0.0", sourceRefs: jobs.flatMap((job) => job.sourceRefs), createdAt: new Date().toISOString() };
+    const sourceConversationId =
+      typeof request.body.sourceConversationId === "string"
+        ? request.body.sourceConversationId.trim()
+        : undefined;
+    const match: JobMatch = { matchId: randomUUID(), sourceConversationId, inputSnapshot: { rawText: String(rawText), interestActivities: preferences.interestActivities }, candidates, matchingLogicVersion: "1.0.0", sourceRefs: jobs.flatMap((job) => job.sourceRefs), createdAt: new Date().toISOString() };
     response.status(201).json({ preferences, match: await repo.saveJobMatch(request.params.requestedUserId, match) });
   } catch (error) {
     response.status(503).json({ error: errorMessage(error) });
@@ -270,13 +274,13 @@ app.post("/users/:requestedUserId/preferences", async (request, response) => {
 
 app.post("/simulations", async (request, response) => {
   try {
-    const { jobId, variantId, worldTitle, difficulty = 2 } = request.body as Record<string, unknown>;
+    const { jobId, variantId, worldTitle, difficulty = 2, relatedConversationId } = request.body as Record<string, unknown>;
     if (typeof jobId !== "string" || typeof variantId !== "string" || typeof worldTitle !== "string") {
       response.status(400).json({ error: "jobId, variantId, and worldTitle are required" });
       return;
     }
     const now = new Date().toISOString();
-    const state: SimulationState = { sessionId: randomUUID(), ownerId: userId(request), jobId, variantId, worldTitle, status: "active", currentSlotId: "SLOT_01", currentSceneId: null, elapsedMinutes: 0, difficulty: Number(difficulty), stateVersion: 1, parentSessionId: null, branchFromSceneId: null, startedAt: now, updatedAt: now, completedAt: null };
+    const state: SimulationState = { sessionId: randomUUID(), ownerId: userId(request), relatedConversationId: typeof relatedConversationId === "string" ? relatedConversationId : undefined, jobId, variantId, worldTitle, status: "active", currentSlotId: "SLOT_01", currentSceneId: null, elapsedMinutes: 0, difficulty: Number(difficulty), stateVersion: 1, parentSessionId: null, branchFromSceneId: null, startedAt: now, updatedAt: now, completedAt: null };
     response.status(201).json({ simulation: await repository().createSimulation(state) });
   } catch (error) {
     response.status(503).json({ error: errorMessage(error) });

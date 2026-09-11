@@ -109,6 +109,8 @@ simulations/{sessionId}
 - 대화 세션은 `relatedSimulationId`로 시뮬레이션과 연결한다.
 - 대화에서 추출한 직무 관심은 기존 `users/{userId}/jobMatches`에
   `sourceConversationId`를 추가해 연결한다.
+- 시뮬레이션 생성 요청의 `relatedConversationId`는
+  `simulations/{sessionId}`에 저장해 시작 대화와 역방향 연결을 만든다.
 - 시뮬레이션 장면과 회고는 기존 `simulations/{sessionId}` 하위 구조를
   유지하며, 원본 대화 ID를 메타데이터로 보존한다.
 

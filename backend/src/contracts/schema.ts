@@ -39,6 +39,7 @@ export interface JobProfile {
 
 export interface JobMatch {
   matchId: string;
+  sourceConversationId?: string;
   inputSnapshot: {
     rawText: string;
     interestActivities: string[];
