@@ -1,9 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { api, currentUserId } from "../../lib/api";
 
 export default function OnboardingPage() {
+  const router = useRouter();
   const [rawText, setRawText] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -18,7 +20,7 @@ export default function OnboardingPage() {
         method: "POST",
         body: JSON.stringify({ rawText, interestActivities: rawText.split(/[,\s]+/).filter(Boolean) }),
       });
-      window.location.href = "/jobs";
+      router.push("/jobs");
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "저장하지 못했습니다.");
     } finally {

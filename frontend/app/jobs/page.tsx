@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { api } from "../../lib/api";
 
 type Job = { jobId: string; name: string; description: string; standardTasks: string[]; skills: string[] };
 type Variant = { variantId: string; worldTitle?: string; difficulty?: number };
 
 export default function JobsPage() {
+  const router = useRouter();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [variants, setVariants] = useState<Record<string, Variant[]>>({});
   const [error, setError] = useState("");
@@ -19,7 +21,7 @@ export default function JobsPage() {
       const variant = result.variants[0];
       if (!variant) throw new Error("이 직무에 등록된 variant가 없습니다. Firebase jobProfiles/{jobId}/variants를 먼저 등록해 주세요.");
       const created = await api<{ simulation: { sessionId: string } }>("/simulations", { method: "POST", body: JSON.stringify({ jobId: job.jobId, variantId: variant.variantId, worldTitle: variant.worldTitle ?? job.name, difficulty: variant.difficulty ?? 2 }) });
-      window.location.href = `/simulation/${created.simulation.sessionId}`;
+      router.push(`/simulation/${created.simulation.sessionId}`);
     } catch (reason) { setError(reason instanceof Error ? reason.message : "시뮬레이션을 시작하지 못했습니다."); }
   }
 
