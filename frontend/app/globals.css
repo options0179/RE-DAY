@@ -130,6 +130,12 @@ h1 {
   margin: 2rem 0;
 }
 
+.checkpoint-note {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: -1.25rem;
+}
+
 .scene-card {
   margin-top: 2rem;
 }

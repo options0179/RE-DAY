@@ -19,6 +19,7 @@ export default function SimulationScene({ jobId }: { jobId: string }) {
         <span>09:30</span>
         <span>첫 번째 장면</span>
       </div>
+      <p className="checkpoint-note">자동 저장됨 · 마지막 체크포인트 09:30</p>
       <h1>이전 버전 파일이 공유되었습니다.</h1>
       <p className="intro">
         개발팀에 아직 검토되지 않은 파일이 공유되었습니다. 30분 뒤 회의에서
