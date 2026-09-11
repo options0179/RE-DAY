@@ -18,6 +18,10 @@ function createFirebaseApp() {
     return initializeApp({ projectId });
   }
 
+  if (process.env.K_SERVICE) {
+    return initializeApp();
+  }
+
   if (!projectId || !clientEmail || !privateKey) {
     throw new Error(
       "FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY are required",
