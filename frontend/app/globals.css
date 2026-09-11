@@ -75,6 +75,73 @@ h1 {
   padding: 0.9rem 1.4rem;
 }
 
+.secondary-button {
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  display: inline-block;
+  font-weight: 700;
+  padding: 0.75rem 1.1rem;
+}
+
+.card-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.choice-card,
+.scene-card,
+.result-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.choice-card {
+  align-items: flex-end;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+}
+
+.choice-card h2,
+.scene-card h2,
+.result-card h2 {
+  margin-top: 0;
+}
+
+.choice-card p,
+.result-card p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.choice-card small {
+  color: var(--muted);
+}
+
+.scene-progress {
+  color: var(--muted);
+  display: flex;
+  font-size: 0.85rem;
+  justify-content: space-between;
+  margin: 2rem 0;
+}
+
+.scene-card {
+  margin-top: 2rem;
+}
+
+.scene-card li {
+  line-height: 1.8;
+}
+
+.result-card {
+  margin: 2rem 0;
+}
+
 .steps {
   padding: 0 1rem;
 }
