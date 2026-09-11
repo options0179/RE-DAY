@@ -84,6 +84,12 @@ Prefer **HTTP + Swagger** with a reviewed OpenAPI contract for the RE:DAY
 endpoints. Configure `x-api-key` as a Copilot secret and never place its value
 in the OpenAPI document, source code, or a chat response.
 
+The upload-ready contract is `docs/copilot-studio-openapi.json`. Its operation
+IDs include `RE_DAY_StartDay` and `RE_DAY_CompleteDay`; the context, summary,
+and memory operations are separate connector operations that must be composed
+after the authenticated action editor or an eligible agent-call workflow is
+available.
+
 The action editor and topic orchestration still require an authenticated
 Copilot Studio session with the connector contract loaded. Until that editor
 is available, no `RE_DAY_StartDay` or `RE_DAY_CompleteDay` action should be

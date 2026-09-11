@@ -72,6 +72,7 @@ export class FirestoreChatRepository {
     userId: string,
     conversationId: string,
     channel: string,
+    title: string | null,
     relatedSimulationId: string | null,
   ): Promise<ChatSession> {
     const ref = this.db
@@ -94,7 +95,7 @@ export class FirestoreChatRepository {
       userId,
       channel,
       relatedSimulationId,
-      title: null,
+      title,
       summary: null,
       messageCount: 0,
       status: "active",

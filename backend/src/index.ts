@@ -72,6 +72,7 @@ app.post("/chat/sessions", async (request, response) => {
   try {
     const conversationId = String(request.body.conversationId ?? "").trim();
     const channel = String(request.body.channel ?? "copilot-web").trim();
+    const title = typeof request.body.title === "string" ? request.body.title.trim() : null;
     const relatedSimulationId =
       typeof request.body.relatedSimulationId === "string"
         ? request.body.relatedSimulationId
@@ -84,6 +85,7 @@ app.post("/chat/sessions", async (request, response) => {
       userId(request),
       conversationId,
       channel,
+      title,
       relatedSimulationId,
     );
     response.status(200).json({ session });

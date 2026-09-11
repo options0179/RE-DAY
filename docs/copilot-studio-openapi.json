@@ -1,0 +1,429 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "RE:DAY Persistence API",
+    "version": "1.0.0",
+    "description": "Firestore persistence endpoints for RE:DAY Copilot Studio actions. Configure x-api-key as a connector secret; this document contains no secret value."
+  },
+  "servers": [
+    {
+      "url": "https://re-day-api.onrender.com"
+    }
+  ],
+  "security": [
+    {
+      "copilotApiKey": []
+    }
+  ],
+  "paths": {
+    "/chat/sessions": {
+      "post": {
+        "operationId": "RE_DAY_StartDay",
+        "summary": "Start or reuse a RE:DAY conversation session",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SessionResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/Error"
+          },
+          "503": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/chat/sessions/{conversationId}/context": {
+      "get": {
+        "operationId": "RE_DAY_GetContext",
+        "summary": "Load the session context and confirmed memories",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/conversationId"
+          },
+          {
+            "$ref": "#/components/parameters/userId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session context",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContextResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/chat/sessions/{conversationId}/messages": {
+      "post": {
+        "operationId": "RE_DAY_CompleteDay",
+        "summary": "Persist the final assistant message",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/conversationId"
+          },
+          {
+            "$ref": "#/components/parameters/userId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message persisted or returned idempotently",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/chat/sessions/{conversationId}/summary": {
+      "put": {
+        "operationId": "RE_DAY_SaveSummary",
+        "summary": "Persist the final day summary",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/conversationId"
+          },
+          {
+            "$ref": "#/components/parameters/userId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SummaryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SessionResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/users/me/memories": {
+      "post": {
+        "operationId": "RE_DAY_SaveMemoryCandidate",
+        "summary": "Save a memory candidate pending user confirmation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemoryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pending memory candidate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemoryResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "copilotApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "Configure the value as a connector secret. Never place the value in this document."
+      }
+    },
+    "parameters": {
+      "conversationId": {
+        "name": "conversationId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "userId": {
+        "name": "x-user-id",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "Error": {
+        "description": "Persistence failure",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "SessionResponse": {
+        "description": "Chat session",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SessionResponse"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "StartSessionRequest": {
+        "type": "object",
+        "required": ["conversationId", "channel"],
+        "properties": {
+          "conversationId": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "string",
+            "example": "copilot-studio"
+          },
+          "title": {
+            "type": "string",
+            "example": "RE:DAY daily simulation"
+          }
+        }
+      },
+      "MessageRequest": {
+        "type": "object",
+        "required": ["messageId", "content", "role", "source", "sequence"],
+        "properties": {
+          "messageId": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["assistant"]
+          },
+          "source": {
+            "type": "string",
+            "example": "copilot"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "SummaryRequest": {
+        "type": "object",
+        "required": ["summary"],
+        "properties": {
+          "summary": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "keyPoints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "nextActions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MemoryRequest": {
+        "type": "object",
+        "required": ["type", "key", "value", "sourceConversationId", "confidence"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["preference", "skill", "goal", "avoidance", "experience", "reflection", "fact"]
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "sourceConversationId": {
+            "type": "string"
+          },
+          "sourceMessageId": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      },
+      "SessionResponse": {
+        "type": "object",
+        "required": ["session"],
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/ChatSession"
+          }
+        }
+      },
+      "ContextResponse": {
+        "type": "object",
+        "required": ["context"],
+        "properties": {
+          "context": {
+            "type": "object"
+          }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "$ref": "#/components/schemas/ChatMessage"
+          }
+        }
+      },
+      "MemoryResponse": {
+        "type": "object",
+        "required": ["memory"],
+        "properties": {
+          "memory": {
+            "$ref": "#/components/schemas/UserMemory"
+          }
+        }
+      },
+      "ChatSession": {
+        "type": "object",
+        "properties": {
+          "conversationId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ChatMessage": {
+        "type": "object",
+        "properties": {
+          "messageId": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "sequence": {
+            "type": "integer"
+          }
+        }
+      },
+      "UserMemory": {
+        "type": "object",
+        "properties": {
+          "memoryId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending_confirmation", "confirmed", "rejected", "expired"]
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
