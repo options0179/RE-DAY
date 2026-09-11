@@ -43,13 +43,21 @@ export default function HomePage() {
             </ul>
           </div>
           <div className="hero-panel">
-            <p className="panel-label">오늘의 직무 체험</p>
-            <h2>잘해도 좋고,<br />실수해도 괜찮아요.</h2>
-            <p>관심 있는 직무를 선택하고 현실적인 하루를 시작해보세요.</p>
-            <Link className="primary-button" href="/onboarding" aria-label="직무 경험 시작하기">
-              직무 경험 시작하기 <span aria-hidden="true">→</span>
-            </Link>
-            <p className="card-note">약 10분 · 저장 후 이어하기</p>
+            <div className="hero-panel-top">
+              <p className="panel-label"><span aria-hidden="true">○</span> 오늘의 직무 체험</p>
+              <p className="panel-subtitle">약 10분 동안 진행되는 하루</p>
+            </div>
+            <div className="hero-panel-body">
+              <h2>잘해도 좋고,<br />실수해도 괜찮아요.</h2>
+              <p>관심 있는 직무를 선택하고 현실적인 하루를 시작해보세요.</p>
+              <div className="journey-preview" aria-label="체험 진행 예시">
+                <span>직무 선택</span><i aria-hidden="true">→</i><span>상황 판단</span><i aria-hidden="true">→</i><span>하루 회고</span>
+              </div>
+              <Link className="primary-button" href="/onboarding" aria-label="직무 경험 시작하기">
+                직무 경험 시작하기 <span aria-hidden="true">→</span>
+              </Link>
+              <p className="card-note"><span aria-hidden="true">◷</span> 약 10분 · 저장 후 이어하기</p>
+            </div>
           </div>
         </div>
       </section>
