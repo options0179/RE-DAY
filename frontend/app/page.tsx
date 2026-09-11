@@ -10,9 +10,9 @@ export default function HomePage() {
   return (
     <main>
       <header className="site-header page-width">
-        <Link className="brand" href="/">
-          <span className="brand-mark">R</span>
-          <span>RE:DAY</span>
+        <Link className="brand" href="/" aria-label="RE:DAY 홈">
+          <span className="brand-mark" aria-hidden="true">R</span>
+          <span className="brand-name">RE:DAY</span>
         </Link>
         <nav className="site-nav" aria-label="주요 메뉴">
           <Link href="/history">지난 기록</Link>
@@ -24,23 +24,24 @@ export default function HomePage() {
         <div className="hero-grid">
           <div className="hero-copy">
             <p className="eyebrow">AI 직무 경험 시뮬레이션</p>
-            <h1 id="page-title">직무의 하루를,<br /><span>실패해도 괜찮은 곳에서</span><br />먼저 경험해보세요.</h1>
+            <h1 id="page-title">
+              직무의 하루를,<br />
+              <span>실패해도 괜찮은</span> 곳에서<br />
+              먼저 경험해보세요.
+            </h1>
             <p className="intro">
               관심 있는 일을 고르고 현실적인 상황 속에서 직접 판단해보세요.
               성공도 실패도 모두 경험이 되어, 나에게 맞는 일을 더 선명하게 찾아갈 수 있습니다.
             </p>
           </div>
           <div className="hero-panel">
-            <p className="panel-label">오늘의 작은 도전</p>
-            <h2>잘해도 좋고,<br />실수해도 좋아요.</h2>
-            <p>RE:DAY에서는 결과보다 직접 해보는 과정이 더 중요하니까요.</p>
-            <Link className="primary-button" href="/onboarding">
+            <p className="panel-label">오늘의 직무 체험</p>
+            <h2>잘해도 좋고,<br />실수해도 괜찮아요.</h2>
+            <p>관심 있는 직무를 선택하고 현실적인 하루를 시작해보세요.</p>
+            <Link className="primary-button" href="/onboarding" aria-label="직무 경험 시작하기">
               직무 경험 시작하기 <span aria-hidden="true">→</span>
             </Link>
-            <div className="stat-row" aria-label="서비스 특징">
-              <div><strong>3단계</strong><span>간단한 시작</span></div>
-              <div><strong>실시간</strong><span>AI 상황 생성</span></div>
-            </div>
+            <p className="card-note">약 10분 · 저장 후 이어하기</p>
           </div>
         </div>
       </section>
@@ -51,15 +52,15 @@ export default function HomePage() {
           <h2 id="about-title">정답을 정해두지 않고,<br />도전할 수 있는 장면을 만들어요.</h2>
         </div>
         <div className="about-list">
-            <article className="about-item">
+          <article className="about-item">
             <span className="outline-number">01</span>
             <div><p className="item-label">현실적인 직무 상황</p><h3>업무에서 마주칠 장면을<br />안전하게 먼저 경험합니다.</h3><p>Copilot Agent가 직무에 맞는 상황을 만들고, 실제 업무처럼 판단할 수 있게 도와줍니다.</p></div>
           </article>
-            <article className="about-item">
+          <article className="about-item">
             <span className="outline-number">02</span>
             <div><p className="item-label">선택의 결과 확인</p><h3>내가 어떤 방식으로<br />문제를 해결하는지 살펴봅니다.</h3><p>나의 대응이 업무와 관계에 어떤 변화를 만드는지 장면별로 확인합니다.</p></div>
           </article>
-            <article className="about-item">
+          <article className="about-item">
             <span className="outline-number">03</span>
             <div><p className="item-label">나를 위한 회고</p><h3>경험을 쌓을수록<br />나에게 맞는 일이 선명해집니다.</h3><p>지난 시뮬레이션을 다시 보며 나의 강점과 선호를 차분히 돌아봅니다.</p></div>
           </article>
