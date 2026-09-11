@@ -24,7 +24,12 @@ app.use(async (request, response, next) => {
   }
   const authorization = request.header("authorization");
   if (!authorization?.startsWith("Bearer ")) {
-    response.status(401).json({ error: "Firebase Auth bearer token is required" });
+    const apiKey = process.env.COPILOT_API_KEY;
+    if (apiKey && request.header("x-api-key") === apiKey) {
+      next();
+      return;
+    }
+    response.status(401).json({ error: "Firebase Auth bearer token or valid x-api-key is required" });
     return;
   }
   try {
@@ -337,4 +342,8 @@ app.get("/history", async (request, response) => {
   }
 });
 
-app.listen(port, () => console.log(`RE:DAY backend listening on port ${port}`));
+if (!process.env.FIREBASE_FUNCTIONS && !process.env.K_SERVICE) {
+  app.listen(port, () => console.log(`RE:DAY backend listening on port ${port}`));
+}
+
+export { app };
