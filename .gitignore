@@ -7,3 +7,8 @@ coverage/
 !.env.example
 *.log
 
+backend/.env
+frontend/.env.local
+.firebase/
+.firebase-data/
+service-account*.json
