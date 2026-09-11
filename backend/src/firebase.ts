@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
@@ -6,6 +7,7 @@ function createFirebaseApp() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const serviceAccountFile = process.env.FIREBASE_SERVICE_ACCOUNT_FILE;
 
   if (getApps().length > 0) {
     return getApps()[0];
@@ -20,6 +22,23 @@ function createFirebaseApp() {
 
   if (process.env.K_SERVICE) {
     return initializeApp();
+  }
+
+  if (serviceAccountFile) {
+    const serviceAccount = JSON.parse(readFileSync(serviceAccountFile, "utf8")) as {
+      project_id: string;
+      client_email: string;
+      private_key: string;
+    };
+
+    return initializeApp({
+      credential: cert({
+        projectId: serviceAccount.project_id,
+        clientEmail: serviceAccount.client_email,
+        privateKey: serviceAccount.private_key,
+      }),
+      projectId: serviceAccount.project_id,
+    });
   }
 
   if (!projectId || !clientEmail || !privateKey) {
