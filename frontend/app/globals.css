@@ -1,11 +1,12 @@
 :root {
   color-scheme: light;
-  --ink: #17202a;
-  --muted: #66717d;
-  --line: #dfe7e4;
-  --accent: #176b61;
-  --accent-soft: #e5f2ee;
-  --surface: #f5f8f6;
+  --ink: #5e1d1d;
+  --muted: #806565;
+  --line: #f0dada;
+  --accent: #5e1d1d;
+  --accent-soft: #ffcece;
+  --surface: #fff;
+  --pink-wash: #fff5f5;
 }
 
 * {
@@ -16,7 +17,7 @@ body {
   margin: 0;
   background: var(--surface);
   color: var(--ink);
-  font-family: "Pretendard", "Noto Sans KR", Arial, sans-serif;
+  font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
 }
 
 .copilot-shell {
@@ -68,7 +69,7 @@ a {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(245, 248, 246, 0.92);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
 }
 
@@ -79,17 +80,19 @@ a {
 }
 
 .brand {
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-family: "Arial Rounded MT Bold", "Trebuchet MS", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
   gap: 0.6rem;
   letter-spacing: 0.04em;
 }
 
 .brand-mark {
   align-items: center;
-  background: var(--accent);
-  border-radius: 0.65rem;
-  color: #fff;
+  background: var(--accent-soft);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  color: var(--accent);
   display: flex;
   font-size: 0.9rem;
   height: 2rem;
@@ -115,7 +118,7 @@ a {
 
 .hero-grid {
   align-items: center;
-  background: linear-gradient(135deg, #ffffff 0%, #edf7f3 100%);
+  background: linear-gradient(135deg, #fff 0%, var(--pink-wash) 100%);
   border: 1px solid var(--line);
   border-radius: 1.25rem;
   display: grid;
@@ -143,10 +146,15 @@ h1 {
   margin: 1rem 0 1.5rem;
   max-width: 50ch;
   word-break: keep-all;
+  letter-spacing: -0.045em;
 }
 
 h1 span {
+  background: var(--accent-soft);
+  box-decoration-break: clone;
   color: var(--accent);
+  padding: 0 0.12em;
+  -webkit-box-decoration-break: clone;
 }
 
 .intro {
@@ -167,9 +175,9 @@ h1 span {
 
 .hero-panel {
   background: #fff;
-  border: 1px solid rgba(23, 107, 97, 0.14);
+  border: 1px solid #f0dada;
   border-radius: 1rem;
-  box-shadow: 0 1.5rem 3rem rgba(23, 48, 43, 0.08);
+  box-shadow: 0 1.5rem 3rem rgba(94, 29, 29, 0.1);
   padding: 2rem;
   transform: rotate(1deg);
 }
@@ -226,7 +234,7 @@ h1 span {
 .primary-button {
   background: var(--accent);
   border: 0;
-  border-radius: 0.65rem;
+  border-radius: 999px;
   color: #fff;
   display: inline-block;
   font-weight: 700;
@@ -235,13 +243,13 @@ h1 span {
 }
 
 .primary-button:hover {
-  background: #0f554d;
+  background: #421313;
   transform: translateY(-1px);
 }
 
 .secondary-button {
   border: 1px solid var(--accent);
-  border-radius: 0.65rem;
+  border-radius: 999px;
   color: var(--accent);
   display: inline-block;
   font-weight: 700;
@@ -272,7 +280,8 @@ h1 span {
 }
 
 .status-dot {
-  background: #36a085;
+  background: var(--accent-soft);
+  border: 2px solid var(--accent);
   border-radius: 50%;
   flex: 0 0 auto;
   height: 0.6rem;
@@ -374,7 +383,7 @@ h1 span {
 
 .agent-section {
   align-items: center;
-  background: var(--ink);
+  background: var(--accent);
   border-radius: 1.25rem;
   color: #fff;
   display: flex;
@@ -386,7 +395,7 @@ h1 span {
 }
 
 .agent-section .eyebrow {
-  color: #8fd1c4;
+  color: var(--accent-soft);
 }
 
 .agent-section h2 {
@@ -404,7 +413,7 @@ h1 span {
 }
 
 .agent-section .secondary-button {
-  border-color: #8fd1c4;
+  border-color: var(--accent-soft);
   color: #fff;
 }
 
@@ -523,6 +532,14 @@ h1 span {
   color: var(--accent);
   font-weight: 700;
   padding: 0.35rem 0.55rem;
+}
+
+.service-card:nth-child(2) {
+  background: var(--pink-wash);
+}
+
+.service-card:nth-child(3) {
+  background: #fffafa;
 }
 
 .onboarding-form {
