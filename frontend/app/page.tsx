@@ -17,6 +17,9 @@ export default function HomePage() {
         <a className="primary-button" href="/onboarding">
           시작하기
         </a>
+        <a className="secondary-button" href="/copilot">
+          Copilot Agent와 대화하기
+        </a>
       </section>
 
       <section className="steps" aria-labelledby="steps-title">
