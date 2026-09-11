@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
@@ -7,7 +7,12 @@ function createFirebaseApp() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
-  const serviceAccountFile = process.env.FIREBASE_SERVICE_ACCOUNT_FILE;
+  const configuredServiceAccountFile = process.env.FIREBASE_SERVICE_ACCOUNT_FILE;
+  const serviceAccountFile =
+    configuredServiceAccountFile ||
+    (existsSync("/etc/secrets/firebase-service-account.json")
+      ? "/etc/secrets/firebase-service-account.json"
+      : undefined);
 
   if (getApps().length > 0) {
     return getApps()[0];
