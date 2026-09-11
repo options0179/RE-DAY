@@ -43,20 +43,21 @@ export default function HomePage() {
             </ul>
           </div>
           <div className="hero-panel">
-            <div className="hero-panel-top">
-              <p className="panel-label"><span aria-hidden="true">○</span> 오늘의 직무 체험</p>
-              <p className="panel-subtitle">약 10분 동안 진행되는 하루</p>
+            <div className="simulation-header">
+              <div><span className="simulation-time">10:30</span><strong>UX 디자이너의 하루</strong></div>
+              <span className="simulation-progress-label">2 / 5</span>
+              <div className="simulation-progress" aria-label="진행률 40%"><span /></div>
             </div>
-            <div className="hero-panel-body">
-              <h2>잘해도 좋고,<br />실수해도 괜찮아요.</h2>
-              <p>관심 있는 직무를 선택하고 현실적인 하루를 시작해보세요.</p>
-              <div className="journey-preview" aria-label="체험 진행 예시">
-                <span>직무 선택</span><i aria-hidden="true">→</i><span>상황 판단</span><i aria-hidden="true">→</i><span>하루 회고</span>
+            <div className="simulation-body">
+              <div className="simulation-label">예상치 못한 문제</div>
+              <h2>이전 버전의 파일이<br />공유됐어요</h2>
+              <p className="simulation-description">30분 뒤 개발팀 회의가 시작됩니다. 현재 영향을 받는 화면은 3개입니다.</p>
+              <div className="simulation-message">
+                <span className="message-avatar" aria-hidden="true">개</span>
+                <div><strong>개발팀 선임</strong><p>“어떤 파일이 최종본인지 지금 확인할 수 있을까요?”</p></div>
               </div>
-              <Link className="primary-button" href="/onboarding" aria-label="직무 경험 시작하기">
-                직무 경험 시작하기 <span aria-hidden="true">→</span>
-              </Link>
-              <p className="card-note"><span aria-hidden="true">◷</span> 약 10분 · 저장 후 이어하기</p>
+              <div className="simulation-input" aria-label="대처 입력 미리보기">어떻게 대처하시겠어요?<span aria-hidden="true">↗</span></div>
+              <div className="simulation-footer"><span><i aria-hidden="true">◷</i> 남은 시간 28분</span><span><i aria-hidden="true">!</i> 미해결 문제 1개</span></div>
             </div>
           </div>
         </div>
