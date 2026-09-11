@@ -23,16 +23,24 @@ export default function HomePage() {
       <section className="hero page-width" aria-labelledby="page-title">
         <div className="hero-grid">
           <div className="hero-copy">
-            <p className="eyebrow">AI 직무 경험 시뮬레이션</p>
-            <h1 id="page-title">
-              직무의 하루를,<br />
-              <span>실패해도 괜찮은</span> 곳에서<br />
-              먼저 경험해보세요.
+            <p className="hero-badge"><span aria-hidden="true">✦</span> AI 직무 경험 시뮬레이션</p>
+            <h1 id="page-title" className="hero-title">
+              <span className="hero-title-primary">직무의 하루를,</span>
+              <span className="hero-title-line">
+                <strong className="hero-highlight">실패해도 괜찮은</strong>
+                <span className="hero-title-secondary"> 곳에서</span>
+              </span>
+              <span className="hero-title-action">먼저 경험해보세요.</span>
             </h1>
             <p className="intro">
               관심 있는 일을 고르고 현실적인 상황 속에서 직접 판단해보세요.
               성공도 실패도 모두 경험이 되어, 나에게 맞는 일을 더 선명하게 찾아갈 수 있습니다.
             </p>
+            <ul className="hero-features" aria-label="RE:DAY의 특징">
+              <li><span className="feature-dot feature-dot-brand" aria-hidden="true" />현실적인 직무 상황</li>
+              <li><span className="feature-dot" aria-hidden="true" />자유로운 대처</li>
+              <li><span className="feature-dot" aria-hidden="true" />저장 후 다시 시작</li>
+            </ul>
           </div>
           <div className="hero-panel">
             <p className="panel-label">오늘의 직무 체험</p>
