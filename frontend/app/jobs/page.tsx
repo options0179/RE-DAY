@@ -1,41 +1,27 @@
-const jobs = [
-  {
-    id: "job-ux",
-    name: "UX 디자이너",
-    reason: "관찰한 문제를 구조화하고 사람들과 해결책을 만드는 일",
-    tasks: "사용자 조사 · 요구사항 정리 · 프로토타입 검토",
-  },
-  {
-    id: "job-pm",
-    name: "서비스 기획자",
-    reason: "여러 팀의 목표를 정리하고 다음 행동을 설계하는 일",
-    tasks: "문제 정의 · 일정 조율 · 결과 검토",
-  },
-];
+"use client";
+
+import { useEffect, useState } from "react";
+import { api } from "../../lib/api";
+
+type Job = { jobId: string; name: string; description: string; standardTasks: string[]; skills: string[] };
+type Variant = { variantId: string; worldTitle?: string; difficulty?: number };
 
 export default function JobsPage() {
-  return (
-    <main className="page-shell narrow">
-      <p className="eyebrow">02 / job match</p>
-      <h1>이런 직무를 먼저 경험해볼까요?</h1>
-      <p className="intro">
-        추천 결과는 가능성을 탐색하기 위한 제안입니다. 정답이나 적합도 판정이
-        아닙니다.
-      </p>
-      <div className="card-list">
-        {jobs.map((job) => (
-          <article className="choice-card" key={job.id}>
-            <div>
-              <h2>{job.name}</h2>
-              <p>{job.reason}</p>
-              <small>{job.tasks}</small>
-            </div>
-            <a className="secondary-button" href={`/simulation/${job.id}`}>
-              하루 살펴보기
-            </a>
-          </article>
-        ))}
-      </div>
-    </main>
-  );
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [variants, setVariants] = useState<Record<string, Variant[]>>({});
+  const [error, setError] = useState("");
+
+  useEffect(() => { api<{ jobs: Job[] }>("/jobs").then(({ jobs: values }) => setJobs(values)).catch((reason) => setError(reason instanceof Error ? reason.message : "직무를 불러오지 못했습니다.")); }, []);
+
+  async function start(job: Job) {
+    try {
+      const result = await api<{ variants: Variant[] }>(`/jobs/${job.jobId}/variants`);
+      const variant = result.variants[0];
+      if (!variant) throw new Error("이 직무에 등록된 variant가 없습니다. Firebase jobProfiles/{jobId}/variants를 먼저 등록해 주세요.");
+      const created = await api<{ simulation: { sessionId: string } }>("/simulations", { method: "POST", body: JSON.stringify({ jobId: job.jobId, variantId: variant.variantId, worldTitle: variant.worldTitle ?? job.name, difficulty: variant.difficulty ?? 2 }) });
+      window.location.href = `/simulation/${created.simulation.sessionId}`;
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "시뮬레이션을 시작하지 못했습니다."); }
+  }
+
+  return <main className="page-shell narrow"><p className="eyebrow">02 / job match</p><h1>Firebase의 직무 프로필</h1><p className="intro">jobProfiles 컬렉션에서 불러온 데이터입니다.</p>{error && <p role="alert">{error}</p>}<div className="card-list">{jobs.map((job) => <article className="choice-card" key={job.jobId}><div><h2>{job.name}</h2><p>{job.description}</p><small>{job.standardTasks.join(" · ")}{job.skills.length ? ` · ${job.skills.join(" · ")}` : ""}</small></div><button className="secondary-button" onClick={() => start(job)}>하루 시작하기</button></article>)}</div></main>;
 }

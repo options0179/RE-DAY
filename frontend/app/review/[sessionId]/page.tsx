@@ -1,30 +1,13 @@
-export default function ReviewPage() {
-  return (
-    <main className="page-shell narrow">
-      <p className="eyebrow">04 / review</p>
-      <h1>오늘의 선택을 돌아볼까요?</h1>
-      <p className="intro">
-        해결 여부보다, 어떤 정보를 확인하고 누구와 소통했는지를 중심으로
-        기록했습니다.
-      </p>
-      <section className="result-card">
-        <p className="eyebrow">얻은 업적</p>
-        <h2>일단 보고는 했다</h2>
-        <p>문제를 숨기지 않고 관련된 사람에게 상황을 공유했습니다.</p>
-      </section>
-      <section className="scene-card">
-        <h2>다시 시도해볼 장면</h2>
-        <p>
-          상황을 공유하기 전에 변경 범위를 먼저 확인했다면 어떤 흐름이
-          만들어졌을지 비교해볼 수 있습니다.
-        </p>
-        <a className="secondary-button" href="/simulation/job-ux">
-          장면부터 다시 시작하기
-        </a>
-      </section>
-      <a className="secondary-button" href="/jobs">
-        다른 직무도 살펴보기
-      </a>
-    </main>
-  );
+"use client";
+
+import { useEffect, useState } from "react";
+import { api } from "../../../lib/api";
+
+type Scene = { analysis?: { behaviorTags: string[]; immediateEffect: string; evidence: string }; consequence?: { characterReaction: string } };
+export default function ReviewPage({ params }: { params: Promise<{ sessionId: string }> }) {
+  const [sessionId, setSessionId] = useState("");
+  const [scene, setScene] = useState<Scene | null>(null);
+  const [error, setError] = useState("");
+  useEffect(() => { params.then(({ sessionId: id }) => { setSessionId(id); return api<{ scene: Scene | null }>(`/simulations/${id}`).then(({ scene: value }) => setScene(value)); }).catch((reason) => setError(reason instanceof Error ? reason.message : "회고를 불러오지 못했습니다.")); }, [params]);
+  return <main className="page-shell narrow"><p className="eyebrow">04 / review</p><h1>Firebase에 저장된 선택을 돌아볼까요?</h1><p className="intro">장면과 분석은 simulations/{sessionId}/scenes에서 읽습니다.</p>{error && <p role="alert">{error}</p>}{scene?.analysis ? <><section className="result-card"><p className="eyebrow">행동 근거</p><h2>{scene.analysis.behaviorTags.join(" · ") || "분석 대기"}</h2><p>{scene.analysis.evidence}</p><p>{scene.analysis.immediateEffect}</p></section><section className="scene-card"><h2>결과</h2><p>{scene.consequence?.characterReaction ?? "저장된 consequence가 없습니다."}</p></section></> : <p className="intro">아직 저장된 장면이 없습니다.</p>}<a className="secondary-button" href="/history">히스토리로 돌아가기</a></main>;
 }

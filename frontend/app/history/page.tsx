@@ -1,34 +1,13 @@
-const sessions = [
-  {
-    job: "UX 디자이너",
-    date: "2026년 9월 11일",
-    summary: "문제를 발견하고 먼저 상황을 공유했습니다.",
-    sceneId: "scene-1",
-  },
-];
+"use client";
+
+import { useEffect, useState } from "react";
+import { api } from "../../lib/api";
+
+type Simulation = { sessionId: string; jobId: string; status: string; updatedAt: string };
 
 export default function HistoryPage() {
-  return (
-    <main className="page-shell narrow">
-      <p className="eyebrow">history</p>
-      <h1>내가 지나온 하루</h1>
-      <p className="intro">
-        완료한 시뮬레이션과 다시 살펴보고 싶은 장면을 확인할 수 있습니다.
-      </p>
-      <div className="card-list">
-        {sessions.map((session) => (
-          <article className="choice-card" key={session.date}>
-            <div>
-              <p className="eyebrow">{session.date}</p>
-              <h2>{session.job}</h2>
-              <p>{session.summary}</p>
-            </div>
-            <a className="secondary-button" href={`/review/${session.sceneId}`}>
-              회고 보기
-            </a>
-          </article>
-        ))}
-      </div>
-    </main>
-  );
+  const [simulations, setSimulations] = useState<Simulation[]>([]);
+  const [error, setError] = useState("");
+  useEffect(() => { api<{ simulations: Simulation[] }>("/history").then(({ simulations: values }) => setSimulations(values)).catch((reason) => setError(reason instanceof Error ? reason.message : "히스토리를 불러오지 못했습니다.")); }, []);
+  return <main className="page-shell narrow"><p className="eyebrow">history</p><h1>내가 지나온 하루</h1><p className="intro">simulations 컬렉션에서 Firebase로 불러온 기록입니다.</p>{error && <p role="alert">{error}</p>}<div className="card-list">{simulations.map((simulation) => <article className="choice-card" key={simulation.sessionId}><div><p className="eyebrow">{new Date(simulation.updatedAt).toLocaleString("ko-KR")}</p><h2>{simulation.jobId}</h2><p>{simulation.status}</p></div><a className="secondary-button" href={`/simulation/${simulation.sessionId}`}>이어하기</a></article>)}</div></main>;
 }

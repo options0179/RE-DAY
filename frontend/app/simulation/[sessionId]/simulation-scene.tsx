@@ -1,65 +1,29 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { api } from "../../../lib/api";
+
+type Scene = { sceneId: string; incident: { title: string; visibleSituation: string; availableInformation: string[]; timePressure: string }; analysis?: { behaviorTags: string[]; immediateEffect: string; relationshipChange: number; taskChange: number; evidence: string }; consequence?: { characterReaction: string; timeConsumedMinutes: number; carryOverIssueIds: string[]; slotComplete: boolean } };
+type Simulation = { sessionId: string; jobId: string; currentSlotId: string; stateVersion: number; elapsedMinutes?: number };
+type Variant = { title?: string; incident?: Scene["incident"]; scenes?: Array<{ incident: Scene["incident"] }> };
 
 export default function SimulationScene({ jobId }: { jobId: string }) {
+  const [simulation, setSimulation] = useState<Simulation | null>(null);
+  const [variant, setVariant] = useState<Variant | null>(null);
+  const [scene, setScene] = useState<Scene | null>(null);
   const [response, setResponse] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  useEffect(() => { api<{ simulation: Simulation; variant: Variant | null; scene: Scene | null }>(`/simulations/${jobId}`).then((value) => { setSimulation(value.simulation); setVariant(value.variant); setScene(value.scene); }).catch((reason) => setError(reason instanceof Error ? reason.message : "시뮬레이션을 불러오지 못했습니다.")); }, [jobId]);
+  const incident = scene?.incident ?? variant?.incident ?? variant?.scenes?.[0]?.incident;
 
-  function submitResponse(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
-    if (response.trim().length === 0) return;
-    setSubmitted(true);
+    if (!simulation || !incident || !response.trim()) return;
+    try {
+      const result = await api<{ simulation: Simulation; scene: Scene }>(`/simulations/${jobId}/scenes`, { method: "POST", body: JSON.stringify({ responseText: response, incident, analysis: { behaviorTags: [], immediateEffect: "Agent 분석 대기", delayedEffect: null, relationshipChange: 0, taskChange: 0, evidence: response }, consequence: { characterReaction: "Agent 분석 대기", timeConsumedMinutes: 0, carryOverIssueIds: [], slotComplete: false }, sourceRefs: [], promptVersion: "pending-agent-analysis" }) });
+      setSimulation(result.simulation); setScene(result.scene); setResponse("");
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "응답을 저장하지 못했습니다."); }
   }
 
-  return (
-    <main className="page-shell narrow">
-      <p className="eyebrow">03 / simulation · {jobId}</p>
-      <div className="scene-progress" aria-label="진행 상황">
-        <span>09:30</span>
-        <span>첫 번째 장면</span>
-      </div>
-      <p className="checkpoint-note">자동 저장됨 · 마지막 체크포인트 09:30</p>
-      <h1>이전 버전 파일이 공유되었습니다.</h1>
-      <p className="intro">
-        개발팀에 아직 검토되지 않은 파일이 공유되었습니다. 30분 뒤 회의에서
-        사용할 자료라서 지금 확인이 필요합니다.
-      </p>
-      <section className="scene-card" aria-labelledby="scene-context">
-        <h2 id="scene-context">지금 알고 있는 사실</h2>
-        <ul>
-          <li>공유된 파일명은 `checkout-flow-v2`입니다.</li>
-          <li>파일을 받은 사람은 개발팀 선임입니다.</li>
-          <li>어떤 내용이 바뀌었는지는 아직 확인하지 못했습니다.</li>
-        </ul>
-      </section>
-      {submitted ? (
-        <section className="result-card" aria-live="polite">
-          <p className="eyebrow">분석 완료</p>
-          <h2>먼저 상황을 공유하고 사실을 확인하려고 했어요.</h2>
-          <p>
-            문제를 숨기지 않고 확인할 대상을 좁혔습니다. 다음 장면에서는 팀과
-            수정 범위를 조율하게 됩니다.
-          </p>
-          <a className="primary-button" href="/review/demo">
-            장면 회고 보기
-          </a>
-        </section>
-      ) : (
-        <form className="onboarding-form" onSubmit={submitResponse}>
-          <label htmlFor="response">어떻게 대응하시겠어요?</label>
-          <textarea
-            id="response"
-            value={response}
-            onChange={(event) => setResponse(event.target.value)}
-            placeholder="생각한 행동과 그 이유를 자유롭게 적어주세요."
-            rows={6}
-          />
-          <button className="primary-button" type="submit">
-            이 선택으로 진행하기
-          </button>
-        </form>
-      )}
-    </main>
-  );
+  return <main className="page-shell narrow"><p className="eyebrow">03 / simulation · {simulation?.jobId ?? jobId}</p>{error && <p role="alert">{error}</p>}{incident ? <><div className="scene-progress"><span>{simulation?.elapsedMinutes ?? 0}분</span><span>{simulation?.currentSlotId}</span></div><h1>{incident.title}</h1><p className="intro">{incident.visibleSituation}</p><section className="scene-card"><h2>지금 알고 있는 사실</h2><ul>{incident.availableInformation.map((item) => <li key={item}>{item}</li>)}</ul><p>{incident.timePressure}</p></section>{scene?.analysis && <section className="result-card"><p className="eyebrow">저장된 분석</p><p>{scene.analysis.evidence}</p></section>}<form className="onboarding-form" onSubmit={submit}><label htmlFor="response">어떻게 대응하시겠어요?</label><textarea id="response" value={response} onChange={(event) => setResponse(event.target.value)} rows={6} /><button className="primary-button" type="submit">Firebase에 저장하기</button></form></> : <p className="intro">Firebase의 jobProfiles/{simulation?.jobId}/variants/{String((simulation as unknown as { variantId?: string })?.variantId ?? "")}에 장면 데이터가 없습니다.</p>}</main>;
 }
