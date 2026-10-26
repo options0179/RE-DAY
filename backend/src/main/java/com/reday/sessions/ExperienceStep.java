@@ -44,7 +44,10 @@ public class ExperienceStep {
 
   private Instant submittedAt;
 
-  @ElementCollection
+  // EAGER: small, always read together with the step, and DTOs built from a *loaded* step
+  // (listSteps) get serialized after the transaction closes — lazy here throws
+  // LazyInitializationException at the HTTP boundary.
+  @ElementCollection(fetch = jakarta.persistence.FetchType.EAGER)
   @CollectionTable(name = "experience_step_behavior_tags", joinColumns = @JoinColumn(name = "step_id"))
   @Column(name = "tag")
   private List<String> behaviorTags = new ArrayList<>();
@@ -66,7 +69,7 @@ public class ExperienceStep {
 
   private int timeConsumedMinutes;
 
-  @ElementCollection
+  @ElementCollection(fetch = jakarta.persistence.FetchType.EAGER)
   @CollectionTable(name = "experience_step_carry_over_issues", joinColumns = @JoinColumn(name = "step_id"))
   @Column(name = "issue_id")
   private List<String> carryOverIssueIds = new ArrayList<>();
