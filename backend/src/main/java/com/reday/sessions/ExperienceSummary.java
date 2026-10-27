@@ -27,12 +27,15 @@ public class ExperienceSummary {
   @Column(length = 2000)
   private String timelineSummary;
 
-  @ElementCollection
+  // EAGER — see ExperienceStep for why: GET /sessions/:id/summary serializes a *loaded*
+  // entity after its transaction has closed, so lazy collections would throw
+  // LazyInitializationException at the HTTP boundary.
+  @ElementCollection(fetch = jakarta.persistence.FetchType.EAGER)
   @CollectionTable(name = "experience_summary_strengths", joinColumns = @JoinColumn(name = "session_id"))
   @Column(name = "strength", length = 1000)
   private List<String> strengths = new ArrayList<>();
 
-  @ElementCollection
+  @ElementCollection(fetch = jakarta.persistence.FetchType.EAGER)
   @CollectionTable(name = "experience_summary_try_next", joinColumns = @JoinColumn(name = "session_id"))
   @Column(name = "try_next", length = 1000)
   private List<String> tryNext = new ArrayList<>();
@@ -40,7 +43,7 @@ public class ExperienceSummary {
   @Column(length = 2000)
   private String userReflection;
 
-  @ElementCollection
+  @ElementCollection(fetch = jakarta.persistence.FetchType.EAGER)
   @CollectionTable(name = "experience_summary_achievements", joinColumns = @JoinColumn(name = "session_id"))
   @Column(name = "title", length = 500)
   private List<String> achievementTitles = new ArrayList<>();

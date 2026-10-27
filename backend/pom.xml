@@ -53,6 +53,15 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- TestRestTemplate auto-upgrades to this client when present. The JDK's own
+         HttpURLConnection can't send PATCH and mishandles 401 responses in streaming
+         mode ("cannot retry due to server authentication") — both of which the API
+         coverage test needs. -->
+    <dependency>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
