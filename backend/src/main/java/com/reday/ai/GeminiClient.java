@@ -23,11 +23,24 @@ public class GeminiClient {
 
     var requestFactory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
     requestFactory.setConnectTimeout(10_000);
-    requestFactory.setReadTimeout(30_000);
+    // Free-tier latency on this prompt size has been observed up to ~270s even with thinking
+    // disabled and schema-constrained decoding — 30s was cutting off genuine in-flight successes.
+    requestFactory.setReadTimeout(300_000);
     this.restClient = RestClient.builder().requestFactory(requestFactory).build();
   }
 
+  /** Overload for callers that don't need a constrained output shape. */
   public String generate(String systemInstruction, String userPrompt) {
+    return generate(systemInstruction, userPrompt, null);
+  }
+
+  /**
+   * @param responseSchema Gemini's OpenAPI-subset schema (uppercase types: OBJECT, STRING,
+   *     ARRAY, INTEGER, BOOLEAN; "properties", "required", "items", "nullable"). When present,
+   *     this constrains decoding to that exact shape instead of relying on the model to follow a
+   *     plain-text "respond with JSON only" instruction, which it doesn't reliably do.
+   */
+  public String generate(String systemInstruction, String userPrompt, Map<String, Object> responseSchema) {
     if (apiKey.isEmpty()) {
       throw new IllegalStateException("GEMINI_API_KEY is required");
     }
@@ -39,12 +52,23 @@ public class GeminiClient {
         .formatted(model, apiKey);
 
     // thinkingBudget 0 disables the model's default "thinking" pass — on gemini-3.8-flash that
-    // pass alone took 200s+ in testing even for a one-word reply; without it, ~7s. This service
-    // only needs fast structured JSON, not extended reasoning.
+    // pass alone took 200s+ in testing even for a one-word reply; without it, ~7s on a short
+    // prompt. responseMimeType + responseSchema constrain decoding at the API level:
+    // main-instructions.md is the old Copilot Studio Agent's conversational system prompt, and a
+    // plain-text "respond with JSON only" instruction isn't enough — without responseMimeType it
+    // answers in its narrative/choice-button persona, and even with responseMimeType alone it
+    // invents its own JSON shape instead of the one spelled out in the prompt text.
+    var generationConfig = new java.util.HashMap<String, Object>();
+    generationConfig.put("thinkingConfig", Map.of("thinkingBudget", 0));
+    generationConfig.put("responseMimeType", "application/json");
+    if (responseSchema != null) {
+      generationConfig.put("responseSchema", responseSchema);
+    }
+
     Map<String, Object> requestBody = Map.of(
         "systemInstruction", Map.of("parts", new Object[] {Map.of("text", systemInstruction)}),
         "contents", new Object[] {Map.of("role", "user", "parts", new Object[] {Map.of("text", userPrompt)})},
-        "generationConfig", Map.of("thinkingConfig", Map.of("thinkingBudget", 0)));
+        "generationConfig", generationConfig);
 
     // Read the raw bytes and parse manually instead of letting RestClient pick a converter by
     // Content-Type: Gemini sometimes answers a 200 with "application/octet-stream" instead of

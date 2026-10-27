@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +15,47 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SceneAnalysisService {
+
+  /**
+   * Of the 9 extracted skills, only these two produce this call's output (analysis +
+   * consequence) — the rest (worldbuilder, scenegeneerator, crisisgenerator,
+   * jobientresolver, dayreviewcomposer, narrativehumanizer, realityvalidator) cover other
+   * parts of the old Copilot Agent flow that this service doesn't perform. Sending all 9 made
+   * the system instruction ~32KB, which the free-tier Gemini key rejected outright with a 503
+   * "high demand"; trimming to just these two keeps the prompt within what actually succeeds.
+   */
+  private static final Set<String> RELEVANT_SKILLS = Set.of("responseanalyzer", "consequencesimulator");
+
+  /**
+   * Gemini's structured-output schema for this call's JSON contract. Without this, the model
+   * doesn't reliably follow the shape spelled out in buildSystemInstruction()'s text — it either
+   * ignores the "JSON only" instruction entirely (answering in main-instructions.md's narrative
+   * persona instead) or emits valid-but-differently-shaped JSON (e.g. a self-invented
+   * "consequence_simulation" object). See GeminiClient#generate for how this is applied.
+   */
+  private static final Map<String, Object> RESPONSE_SCHEMA = Map.of(
+      "type", "OBJECT",
+      "properties", Map.of(
+          "skillCalls", Map.of("type", "ARRAY", "items", Map.of("type", "STRING")),
+          "analysis", Map.of(
+              "type", "OBJECT",
+              "properties", Map.of(
+                  "behaviorTags", Map.of("type", "ARRAY", "items", Map.of("type", "STRING")),
+                  "immediateEffect", Map.of("type", "STRING"),
+                  "delayedEffect", Map.of("type", "STRING", "nullable", true),
+                  "relationshipChange", Map.of("type", "INTEGER"),
+                  "taskChange", Map.of("type", "INTEGER"),
+                  "evidence", Map.of("type", "STRING")),
+              "required", List.of("behaviorTags", "immediateEffect", "relationshipChange", "taskChange", "evidence")),
+          "consequence", Map.of(
+              "type", "OBJECT",
+              "properties", Map.of(
+                  "characterReaction", Map.of("type", "STRING"),
+                  "timeConsumedMinutes", Map.of("type", "INTEGER"),
+                  "carryOverIssueIds", Map.of("type", "ARRAY", "items", Map.of("type", "STRING")),
+                  "slotComplete", Map.of("type", "BOOLEAN")),
+              "required", List.of("characterReaction", "timeConsumedMinutes", "carryOverIssueIds", "slotComplete"))),
+      "required", List.of("skillCalls", "analysis", "consequence"));
 
   public record ResponseAnalysis(List<String> behaviorTags, String immediateEffect, String delayedEffect,
       int relationshipChange, int taskChange, String evidence) {
@@ -38,19 +79,21 @@ public class SceneAnalysisService {
 
   public SceneAnalysisResult analyze(String jobName, String incident, String responseText) {
     AgentPromptCatalog.Prompts prompts = promptCatalog.load();
-    Set<String> allowedSkills = prompts.skills().stream().map(AgentPromptCatalog.SkillPrompt::name).collect(Collectors.toSet());
+    List<AgentPromptCatalog.SkillPrompt> relevantSkills = prompts.skills().stream()
+        .filter(skill -> RELEVANT_SKILLS.contains(skill.name()))
+        .toList();
 
-    String systemInstruction = buildSystemInstruction(prompts);
+    String systemInstruction = buildSystemInstruction(prompts, relevantSkills);
     String userPrompt = "직무: %s\n현재 사건: %s\n사용자 응답: %s".formatted(jobName, incident, responseText);
-    String raw = geminiClient.generate(systemInstruction, userPrompt);
-    return parseResult(raw, allowedSkills);
+    String raw = geminiClient.generate(systemInstruction, userPrompt, RESPONSE_SCHEMA);
+    return parseResult(raw);
   }
 
-  private static String buildSystemInstruction(AgentPromptCatalog.Prompts prompts) {
+  private static String buildSystemInstruction(AgentPromptCatalog.Prompts prompts, List<AgentPromptCatalog.SkillPrompt> relevantSkills) {
     StringBuilder builder = new StringBuilder();
     builder.append(prompts.mainInstructions());
     builder.append("\n\n## 추출된 Skill 안내");
-    for (AgentPromptCatalog.SkillPrompt skill : prompts.skills()) {
+    for (AgentPromptCatalog.SkillPrompt skill : relevantSkills) {
       builder.append("\n\n### Skill: ").append(skill.name()).append('\n').append(skill.content());
     }
     builder.append("\n\n## 출력 계약\n");
@@ -60,7 +103,12 @@ public class SceneAnalysisService {
     return builder.toString();
   }
 
-  private SceneAnalysisResult parseResult(String raw, Set<String> allowedSkills) {
+  private SceneAnalysisResult parseResult(String raw) {
+    // skillCalls is part of the response contract (and the schema) but isn't used past this
+    // point — ExperienceStep never persists it — so it's read for shape validation only. The
+    // model writes human-readable names from the skill prompts ("Response Analyzer") rather than
+    // our internal slugs ("responseanalyzer"), so there's nothing meaningful left to validate
+    // its *contents* against.
     String trimmed = raw.replaceFirst("(?i)^```json\\s*", "").replaceFirst("\\s*```$", "").trim();
     JsonNode value;
     try {
@@ -70,13 +118,6 @@ public class SceneAnalysisService {
     }
     if (!value.has("skillCalls") || !value.get("skillCalls").isArray()) {
       throw new IllegalStateException("invalid Agent result: skillCalls is required");
-    }
-    List<String> skillCalls = new ArrayList<>();
-    value.get("skillCalls").forEach(node -> skillCalls.add(node.asText()));
-    for (String skill : skillCalls) {
-      if (!allowedSkills.contains(skill)) {
-        throw new IllegalStateException("unknown skill: " + skill);
-      }
     }
 
     JsonNode analysisNode = value.path("analysis");
