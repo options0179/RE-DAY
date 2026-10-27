@@ -1,6 +1,8 @@
 package com.reday.ai;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,7 @@ public class GeminiClient {
   private final String apiKey;
   private final String model;
   private final RestClient restClient;
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
   public GeminiClient(@Value("${reday.gemini.api-key}") String apiKey, @Value("${reday.gemini.model}") String model) {
     this.apiKey = apiKey == null ? "" : apiKey.trim();
@@ -20,7 +23,7 @@ public class GeminiClient {
 
     var requestFactory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
     requestFactory.setConnectTimeout(10_000);
-    requestFactory.setReadTimeout(90_000);
+    requestFactory.setReadTimeout(30_000);
     this.restClient = RestClient.builder().requestFactory(requestFactory).build();
   }
 
@@ -35,28 +38,47 @@ public class GeminiClient {
     String url = "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s"
         .formatted(model, apiKey);
 
+    // thinkingBudget 0 disables the model's default "thinking" pass — on gemini-3.8-flash that
+    // pass alone took 200s+ in testing even for a one-word reply; without it, ~7s. This service
+    // only needs fast structured JSON, not extended reasoning.
     Map<String, Object> requestBody = Map.of(
         "systemInstruction", Map.of("parts", new Object[] {Map.of("text", systemInstruction)}),
-        "contents", new Object[] {Map.of("role", "user", "parts", new Object[] {Map.of("text", userPrompt)})});
+        "contents", new Object[] {Map.of("role", "user", "parts", new Object[] {Map.of("text", userPrompt)})},
+        "generationConfig", Map.of("thinkingConfig", Map.of("thinkingBudget", 0)));
 
-    JsonNode body;
+    // Read the raw bytes and parse manually instead of letting RestClient pick a converter by
+    // Content-Type: Gemini sometimes answers a 200 with "application/octet-stream" instead of
+    // "application/json", which makes Spring's Jackson converter refuse the body outright.
+    byte[] rawBody;
     try {
-      body = restClient.post()
+      rawBody = restClient.post()
           .uri(url)
           .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
           .body(requestBody)
           .retrieve()
-          .body(JsonNode.class);
+          .body(byte[].class);
     } catch (org.springframework.web.client.RestClientResponseException e) {
-      String upstreamMessage = extractErrorMessage(e.getResponseBodyAs(JsonNode.class));
+      String upstreamMessage = extractErrorMessage(parseJson(e.getResponseBodyAsByteArray()));
       throw new IllegalStateException("Gemini request failed (%d): %s".formatted(e.getStatusCode().value(), upstreamMessage));
     }
+    JsonNode body = parseJson(rawBody);
 
     String text = extractText(body);
     if (text == null || text.isBlank()) {
       throw new IllegalStateException("Gemini response did not contain text");
     }
     return text;
+  }
+
+  private JsonNode parseJson(byte[] raw) {
+    if (raw == null || raw.length == 0) {
+      return null;
+    }
+    try {
+      return objectMapper.readTree(raw);
+    } catch (Exception e) {
+      throw new IllegalStateException("Gemini response was not valid JSON: " + new String(raw, StandardCharsets.UTF_8), e);
+    }
   }
 
   private static String extractErrorMessage(JsonNode body) {
