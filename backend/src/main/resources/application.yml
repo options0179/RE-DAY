@@ -1,0 +1,23 @@
+server:
+  port: ${PORT:4000}
+
+spring:
+  application:
+    name: re-day-backend
+  datasource:
+    url: jdbc:h2:mem:reday;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  jackson:
+    default-property-inclusion: non_null
+
+reday:
+  cors-origin: ${CORS_ORIGIN:http://localhost:3000}
+  agent:
+    docs-dir: ${REDAY_AGENT_DOCS_DIR:../docs/agent}
+  gemini:
+    api-key: ${GEMINI_API_KEY:${gemini_api_key:}}
+    model: ${GEMINI_MODEL:${gemini_model:gemini-flash-latest}}

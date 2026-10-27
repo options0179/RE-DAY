@@ -1,0 +1,59 @@
+:root {
+  --re-paper: #fffcf6;
+  --re-canvas: #faf5ea;
+  --re-cream: #f5e8d5;
+  --re-progress-bg: #fae2d5;
+  --re-accent: #ae5237;
+  --re-accent-tint: #fbe4da;
+  --re-sage: #e6ece0;
+  --re-ink: #41372f;
+  --re-ink-muted: #796c62;
+  --re-border: #e5d7c6;
+  --re-disabled-bg: #e5d7c6;
+  --re-disabled-text: #99897a;
+  --re-danger-bg: #fdeee6;
+  --re-radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--re-paper);
+  color: var(--re-ink);
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.re-app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.re-container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
