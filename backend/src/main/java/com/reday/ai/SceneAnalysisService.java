@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
@@ -83,12 +82,11 @@ public class SceneAnalysisService {
     List<AgentPromptCatalog.SkillPrompt> relevantSkills = prompts.skills().stream()
         .filter(skill -> RELEVANT_SKILLS.contains(skill.name()))
         .toList();
-    Set<String> allowedSkills = relevantSkills.stream().map(AgentPromptCatalog.SkillPrompt::name).collect(Collectors.toSet());
 
     String systemInstruction = buildSystemInstruction(prompts, relevantSkills);
     String userPrompt = "직무: %s\n현재 사건: %s\n사용자 응답: %s".formatted(jobName, incident, responseText);
     String raw = geminiClient.generate(systemInstruction, userPrompt, RESPONSE_SCHEMA);
-    return parseResult(raw, allowedSkills);
+    return parseResult(raw);
   }
 
   private static String buildSystemInstruction(AgentPromptCatalog.Prompts prompts, List<AgentPromptCatalog.SkillPrompt> relevantSkills) {
@@ -105,7 +103,12 @@ public class SceneAnalysisService {
     return builder.toString();
   }
 
-  private SceneAnalysisResult parseResult(String raw, Set<String> allowedSkills) {
+  private SceneAnalysisResult parseResult(String raw) {
+    // skillCalls is part of the response contract (and the schema) but isn't used past this
+    // point — ExperienceStep never persists it — so it's read for shape validation only. The
+    // model writes human-readable names from the skill prompts ("Response Analyzer") rather than
+    // our internal slugs ("responseanalyzer"), so there's nothing meaningful left to validate
+    // its *contents* against.
     String trimmed = raw.replaceFirst("(?i)^```json\\s*", "").replaceFirst("\\s*```$", "").trim();
     JsonNode value;
     try {
@@ -115,13 +118,6 @@ public class SceneAnalysisService {
     }
     if (!value.has("skillCalls") || !value.get("skillCalls").isArray()) {
       throw new IllegalStateException("invalid Agent result: skillCalls is required");
-    }
-    List<String> skillCalls = new ArrayList<>();
-    value.get("skillCalls").forEach(node -> skillCalls.add(node.asText()));
-    for (String skill : skillCalls) {
-      if (!allowedSkills.contains(skill)) {
-        throw new IllegalStateException("unknown skill: " + skill);
-      }
     }
 
     JsonNode analysisNode = value.path("analysis");
