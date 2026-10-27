@@ -23,7 +23,9 @@ public class GeminiClient {
 
     var requestFactory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
     requestFactory.setConnectTimeout(10_000);
-    requestFactory.setReadTimeout(30_000);
+    // Free-tier latency on this prompt size has been observed up to ~270s even with thinking
+    // disabled and schema-constrained decoding — 30s was cutting off genuine in-flight successes.
+    requestFactory.setReadTimeout(300_000);
     this.restClient = RestClient.builder().requestFactory(requestFactory).build();
   }
 
