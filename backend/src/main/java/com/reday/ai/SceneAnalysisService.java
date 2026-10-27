@@ -16,6 +16,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class SceneAnalysisService {
 
+  /**
+   * Of the 9 extracted skills, only these two produce this call's output (analysis +
+   * consequence) — the rest (worldbuilder, scenegeneerator, crisisgenerator,
+   * jobientresolver, dayreviewcomposer, narrativehumanizer, realityvalidator) cover other
+   * parts of the old Copilot Agent flow that this service doesn't perform. Sending all 9 made
+   * the system instruction ~32KB, which the free-tier Gemini key rejected outright with a 503
+   * "high demand"; trimming to just these two keeps the prompt within what actually succeeds.
+   */
+  private static final Set<String> RELEVANT_SKILLS = Set.of("responseanalyzer", "consequencesimulator");
+
   public record ResponseAnalysis(List<String> behaviorTags, String immediateEffect, String delayedEffect,
       int relationshipChange, int taskChange, String evidence) {
   }
@@ -38,19 +48,22 @@ public class SceneAnalysisService {
 
   public SceneAnalysisResult analyze(String jobName, String incident, String responseText) {
     AgentPromptCatalog.Prompts prompts = promptCatalog.load();
-    Set<String> allowedSkills = prompts.skills().stream().map(AgentPromptCatalog.SkillPrompt::name).collect(Collectors.toSet());
+    List<AgentPromptCatalog.SkillPrompt> relevantSkills = prompts.skills().stream()
+        .filter(skill -> RELEVANT_SKILLS.contains(skill.name()))
+        .toList();
+    Set<String> allowedSkills = relevantSkills.stream().map(AgentPromptCatalog.SkillPrompt::name).collect(Collectors.toSet());
 
-    String systemInstruction = buildSystemInstruction(prompts);
+    String systemInstruction = buildSystemInstruction(prompts, relevantSkills);
     String userPrompt = "직무: %s\n현재 사건: %s\n사용자 응답: %s".formatted(jobName, incident, responseText);
     String raw = geminiClient.generate(systemInstruction, userPrompt);
     return parseResult(raw, allowedSkills);
   }
 
-  private static String buildSystemInstruction(AgentPromptCatalog.Prompts prompts) {
+  private static String buildSystemInstruction(AgentPromptCatalog.Prompts prompts, List<AgentPromptCatalog.SkillPrompt> relevantSkills) {
     StringBuilder builder = new StringBuilder();
     builder.append(prompts.mainInstructions());
     builder.append("\n\n## 추출된 Skill 안내");
-    for (AgentPromptCatalog.SkillPrompt skill : prompts.skills()) {
+    for (AgentPromptCatalog.SkillPrompt skill : relevantSkills) {
       builder.append("\n\n### Skill: ").append(skill.name()).append('\n').append(skill.content());
     }
     builder.append("\n\n## 출력 계약\n");
