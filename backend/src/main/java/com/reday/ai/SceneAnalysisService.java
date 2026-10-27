@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,37 @@ public class SceneAnalysisService {
    * "high demand"; trimming to just these two keeps the prompt within what actually succeeds.
    */
   private static final Set<String> RELEVANT_SKILLS = Set.of("responseanalyzer", "consequencesimulator");
+
+  /**
+   * Gemini's structured-output schema for this call's JSON contract. Without this, the model
+   * doesn't reliably follow the shape spelled out in buildSystemInstruction()'s text — it either
+   * ignores the "JSON only" instruction entirely (answering in main-instructions.md's narrative
+   * persona instead) or emits valid-but-differently-shaped JSON (e.g. a self-invented
+   * "consequence_simulation" object). See GeminiClient#generate for how this is applied.
+   */
+  private static final Map<String, Object> RESPONSE_SCHEMA = Map.of(
+      "type", "OBJECT",
+      "properties", Map.of(
+          "skillCalls", Map.of("type", "ARRAY", "items", Map.of("type", "STRING")),
+          "analysis", Map.of(
+              "type", "OBJECT",
+              "properties", Map.of(
+                  "behaviorTags", Map.of("type", "ARRAY", "items", Map.of("type", "STRING")),
+                  "immediateEffect", Map.of("type", "STRING"),
+                  "delayedEffect", Map.of("type", "STRING", "nullable", true),
+                  "relationshipChange", Map.of("type", "INTEGER"),
+                  "taskChange", Map.of("type", "INTEGER"),
+                  "evidence", Map.of("type", "STRING")),
+              "required", List.of("behaviorTags", "immediateEffect", "relationshipChange", "taskChange", "evidence")),
+          "consequence", Map.of(
+              "type", "OBJECT",
+              "properties", Map.of(
+                  "characterReaction", Map.of("type", "STRING"),
+                  "timeConsumedMinutes", Map.of("type", "INTEGER"),
+                  "carryOverIssueIds", Map.of("type", "ARRAY", "items", Map.of("type", "STRING")),
+                  "slotComplete", Map.of("type", "BOOLEAN")),
+              "required", List.of("characterReaction", "timeConsumedMinutes", "carryOverIssueIds", "slotComplete"))),
+      "required", List.of("skillCalls", "analysis", "consequence"));
 
   public record ResponseAnalysis(List<String> behaviorTags, String immediateEffect, String delayedEffect,
       int relationshipChange, int taskChange, String evidence) {
@@ -55,7 +87,7 @@ public class SceneAnalysisService {
 
     String systemInstruction = buildSystemInstruction(prompts, relevantSkills);
     String userPrompt = "직무: %s\n현재 사건: %s\n사용자 응답: %s".formatted(jobName, incident, responseText);
-    String raw = geminiClient.generate(systemInstruction, userPrompt);
+    String raw = geminiClient.generate(systemInstruction, userPrompt, RESPONSE_SCHEMA);
     return parseResult(raw, allowedSkills);
   }
 
