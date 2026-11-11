@@ -2,6 +2,8 @@
 
 > 이 문서는 과거 구현(`docs/dev/database-summary.md`, `docs/dev/SAD.md`에 기록된 Copilot Studio 시대 설계)을 승계하지 않고, 2026-10-26 Figma 와이어프레임(`jMF6hjDz1fidi66pkx9ZIP`)을 기준으로 완전히 새로 설계한 계약이다. 이름·컬렉션 구조·엔드포인트가 과거 문서와 다른 것은 의도된 것이다.
 
+> **현행 구현 참고:** 현재 체크아웃은 이 계약을 기준으로 한 Java 21 / Spring Boot + React / Vite 구현이다. 세부 구현은 [`docs/dev/SAD.md`](dev/SAD.md)와 소스가 기준이다. 아래 계약 중 가입 토큰은 실제 메일 발송이 아닌 개발용 토큰이고, `retry`는 같은 제출 로직으로 위임되며, 회고는 저장된 단계 결과에서 규칙 기반으로 생성된다. DB는 H2 인메모리다.
+
 ## 0. 설계 원칙
 
 - **화면이 먼저, API는 화면이 요구하는 만큼만.** 9개 와이어프레임 화면 + 이번에 해결한 플로우 문제(가변 진행 단계, 생성 중/재시도/충돌, 체크포인트 되돌리기, 이어하기 분기)를 만족하는 API만 정의한다.
@@ -149,3 +151,23 @@ Achievement
 - 소셜 로그인 여부: MVP는 이메일/비밀번호만.
 - 생성 중 상태를 SSE/스트리밍으로 업그레이드할지: MVP는 동기 HTTP 요청 + 클라이언트 로딩 상태. 생성 시간이 길어지면 스트리밍으로 전환 (`ponytail: 지금은 필요 없음, 응답 지연이 실측으로 문제될 때 추가`).
 - 모바일 반응형: 데스크톱 우선 유지, 별도 브레이크포인트 설계는 후속 작업.
+
+## 7. 현재 코드와 계약의 대응
+
+| 계약 영역 | 현재 구현 | 코드 위치 |
+|---|---|---|
+| Auth | 가입 시 `devVerificationToken` 반환, 현재 화면에서 즉시 인증. 로그인은 UUID bearer token을 저장 | `backend/.../auth/`, `frontend/src/routes/Login.tsx` |
+| Home / Jobs | `/home/summary`, `/jobs`, `/jobs/popular`, `/jobs/{id}/variants` 구현. 직무는 `JobSeedData` fixture | `home/`, `jobs/` |
+| Session | 세션·초안·단계 목록·제출·재시도·rollback·완료·회고 endpoint 구현 | `sessions/SessionController.java`, `SessionService.java` |
+| History | `/history?filter=all\|byJob\|recent` 구현. `byJob`는 직무명순, 나머지는 최근 업데이트순 | `sessions/SessionQueryService.java` |
+| AI | 제출 시 Gemini가 `analysis`와 `consequence`를 생성. `responseanalyzer`, `consequencesimulator` Skill만 입력 | `ai/SceneAnalysisService.java`, `GeminiClient.java` |
+| Persistence | JPA + H2 in-memory | `backend/src/main/resources/application.yml` |
+
+현재 동작의 세부 차이는 다음과 같다.
+
+- 회원가입 API는 메일을 전송하지 않고 인증 토큰을 응답에 포함한다. UI는 이 토큰으로 즉시 `/auth/verify-email`을 호출한다.
+- `POST /sessions/:id/steps/:stepIndex/retry`는 독립적인 생성 재시도 상태나 별도 AI 동작 없이 `submitStep`으로 위임된다. 호출 가능한 단계와 요청 본문 검사는 제출과 같다.
+- `POST /sessions/:id/complete`의 강점·다음 시도·행동 태그는 저장 단계의 관계 점수, 근거, 행동 태그에서 규칙 기반으로 산출한다. Gemini 회고 호출은 없다.
+- `POST /sessions/:id/rollback` 요청은 `toStepIndex`만 받는다. 원 세션은 보존하고 해당 인덱스 이전 단계들을 새 분기에 복사한다.
+- `GET /history?filter=recent`는 현재 `all`과 동일한 최근 업데이트순 결과다. pagination/cursor는 구현되어 있지 않다.
+- AI 호출 실패도 공통 예외 처리에 따라 오류 JSON으로 반환된다. API 경로와 세션·인증 동작의 테스트는 `backend/src/test/java/com/reday/ApiCoverageIntegrationTest.java`, `SessionServiceTest.java`, `auth/AuthServiceTest.java`를 참고한다.
