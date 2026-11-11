@@ -45,7 +45,18 @@ rg -n -i "branch|branching|commit|pull request|merge|release|workflow|codeowners
 
 중첩 디렉터리에 더 구체적인 `AGENTS.md`가 있으면 해당 범위에서는 상위 문서보다 우선한다. 읽지 않은 규칙 문서가 있으면 코드 수정 전에 읽는다.
 
-## 2. 브랜치 탐색과 선택
+**읽기 원칙**: 모든 규칙 문서를 한 번에 읽지 않는다. 현재 작업 단계에 필요한 문서만 읽는다. 관련 없는 다른 issue의 완료된 `docs/dev/ADH/*/ADR`, 다른 issue의 `docs/dev/NRF/*`를 선제적으로 읽지 않는다. 작업 단계가 바뀌면 그때 필요한 문서를 추가로 읽는다.
+
+## 2. 문서-개발 파이프라인 확인
+
+코드를 바꾸기 전에, 이 작업이 `docs/idea/` → GitHub Issue → `docs/dev/ADH/` · `docs/dev/NRF/` 파이프라인의 어느 단계에 있는지 확인한다.
+
+- `docs/idea/plans/`에 이 작업과 연결된 `status: confirmed` 계획과 issue 번호가 있는지 확인한다.
+- issue 번호가 있으면 `docs/dev/ADH/<issue-id>-<slug>/`, `docs/dev/NRF/<issue-id>-<slug>/`가 있는지 확인한다.
+- 이 파이프라인의 세부 규칙·다이어그램·강제 ID 규칙은 중복 작성하지 않고 [`docs/dev/README.md`](docs/dev/README.md)를 따른다. 이 문서(AGENTS.md)는 Git 작업과 직접 관련된 부분만 규정한다.
+- 계획·issue 없이 들어온 작은 수정(오타, 긴급 버그 등)은 이 단계를 건너뛸 수 있다. 다만 왜 건너뛰었는지 완료 보고에 남긴다.
+
+## 3. 브랜치 탐색과 선택
 
 작업 전에 기본 브랜치와 현재 브랜치가 무엇인지 확인한다.
 
@@ -80,7 +91,9 @@ git switch -c <work-branch>
 
 `pull --ff-only`가 실패하면 자동으로 merge/rebase하지 말고 원인과 선택지를 확인한다.
 
-## 3. 브랜치 이름 규칙
+**Worktree 규칙 (예외 없음)**: `git worktree add`는 **사용자가 명시적으로 요청한 경우에만** 실행한다. 병렬 작업, 격리 필요성, 세션 분기 등 어떤 이유로도 예외를 두지 않는다 — 필요해 보인다고 먼저 사용자에게 물어보고 만드는 것도 허용하지 않는다. 사용자의 명시적 요청이 없으면 기존 작업 폴더에서 브랜치를 만들거나 전환해서 작업한다. 사용자 요청으로 만든 worktree를 정리할 때는 작업이 끝난 뒤 원래 브랜치로 병합하고 `git worktree remove`(`--force` 없이)를 쓴다.
+
+## 4. 브랜치 이름 규칙
 
 브랜치 이름은 목적이 드러나도록 다음 형식을 사용한다.
 
@@ -109,6 +122,7 @@ git switch -c <work-branch>
 - 브랜치 하나에는 하나의 목적만 둔다.
 - 관련 없는 리팩터링, 포맷팅, 의존성 업그레이드를 같은 브랜치에 섞지 않는다.
 - 기존 저장소의 명명 규칙이 더 구체적으로 정의되어 있으면 기존 규칙을 따른다.
+- `docs/dev/ADH/`·`docs/dev/NRF/`로 연결된 작업은 `<type>/<issue-id>-<slug>` 형식을 기본값으로 쓴다.
 
 예시:
 
@@ -119,7 +133,7 @@ docs/agent-workflow
 chore/update-firestore-index
 ```
 
-## 4. 액션 단위 커밋 규칙
+## 5. 액션 단위 커밋 규칙
 
 작업은 의미 있는 액션 단위로 나누고, 각 액션이 끝날 때마다 독립적인 커밋을 만든다.
 
@@ -152,6 +166,7 @@ git status --short --branch
 - 문서만 변경하면 `docs: ...`, 브랜치 정책 문서 추가는 `docs: add agent workflow rules`처럼 쓴다.
 - 같은 액션을 고치기 위한 후속 커밋은 허용한다. 기존 커밋을 임의로 amend하거나 squash하지 않는다.
 - 사용자가 요청하지 않은 force push, remote branch 삭제, 커밋 재작성은 하지 않는다.
+- 작업과 관련된 문서(ADR, NRF plan/result 등)도 커밋 대상에 포함한다. 문서라는 이유로 커밋에서 제외하지 않는다.
 
 예시:
 
@@ -176,7 +191,7 @@ fix: reject cross-user session access
 
 각 커밋은 가능하면 독립적으로 빌드·검토·되돌릴 수 있어야 한다. 단, 동작을 완성하기 위해 소스와 테스트가 반드시 함께 바뀌어야 하면 하나의 액션 커밋에 함께 포함한다.
 
-## 5. 변경 전 범위 확인
+## 6. 변경 전 범위 확인
 
 수정 전에 다음을 확인한다.
 
@@ -186,6 +201,7 @@ fix: reject cross-user session access
 - 배포 workflow와 환경변수
 - 사용자 데이터, 권한, 인증, 저장 데이터에 미칠 영향
 - 문서와 코드가 서로 주장하는 범위가 다른지
+- TDD 코드 작성 전이라면, `docs/dev/NRF/<issue-id>-<slug>/plan/`에 결정된 nfr-id가 있는지 확인한다
 
 버그 수정은 호출자를 먼저 검색하고 공유된 원인을 한 곳에서 고친다.
 
@@ -195,7 +211,7 @@ rg -n "functionName|route-name|type-name" .
 
 새로운 분기, 반복문, parser, 금전 계산, 보안 로직, 또는 별도 스크립트를 추가하면 최소 하나의 작은 테스트나 assert를 함께 추가한다.
 
-## 6. 검증과 완료 기준
+## 7. 검증과 완료 기준
 
 각 액션 커밋 전에 변경 위험도에 맞는 검증을 실행한다.
 
@@ -203,12 +219,11 @@ rg -n "functionName|route-name|type-name" .
 # 문서/설정
 git diff --check
 
-# JavaScript/TypeScript 예시
-npm run build
-npm test
+# 백엔드 (Spring Boot / Maven, mvnw 없음 — 시스템 mvn 사용)
+cd backend && mvn test
 
-# Python 예시
-pytest
+# 프런트엔드
+cd frontend && npm test
 ```
 
 완료 전에 다음을 확인한다.
@@ -218,8 +233,32 @@ pytest
 - 마지막 커밋의 staged/unstaged 상태가 깨끗한가
 - 테스트 또는 검증 결과를 기록했는가
 - 남은 위험, 미검증 범위, 수동 확인 사항을 사용자에게 알렸는가
+- NRF 관련 작업이면, 코드 주석의 nfr-id와 `docs/dev/NRF/<issue-id>-<slug>/result/`의 파일명이 같은 ID인가
+- ADR을 작성했다면 `docs/dev/SAD.md` 갱신이 필요한지 확인했는가 (강제 아님, 권고)
 
-## 7. 금지 사항
+**완료 보고 형식**: 코드 또는 문서를 변경한 뒤에는 최종 응답을 아래 형식으로 반환한다.
+
+```text
+## 한 일
+- 실제로 완료한 변경
+
+## 하지 않은 일 (그 이유)
+- 수행하지 않은 항목과 구체적인 이유
+
+## 실패한 일 (그 이유)
+- 시도했지만 실패한 작업과 확인된 실패 원인
+
+## 검증 결과
+- 실행한 검증과 결과
+```
+
+## 8. Merge 규칙
+
+- 대상 작업(또는 issue)의 완료 조건과 테스트 통과를 확인하고, 충돌을 점검한 뒤 병합한다.
+- 병합 후 통합 테스트를 실행한다.
+- 다른 세션·다른 작업자의 브랜치나 작업 범위를 임의로 수정하지 않는다.
+
+## 9. 금지 사항
 
 다음 명령은 사용자 요청이나 명시적인 승인 없이 실행하지 않는다.
 
@@ -230,11 +269,13 @@ git checkout -- <path>
 git restore <path>
 git push --force
 git branch -D <branch>
+git rebase
+git worktree remove --force
 ```
 
 특히 broad path, 저장소 루트, 작업 디렉터리 전체를 대상으로 하는 삭제·복구 명령을 사용하지 않는다. 사용자 변경을 발견하면 보존하고, 충돌 때문에 진행할 수 없을 때만 상황을 설명하고 방향을 요청한다.
 
-## 8. Git 문서 구성 규칙
+## 10. Git 문서 구성 규칙
 
 Git 관련 문서는 다음 구조를 따른다.
 
@@ -266,7 +307,23 @@ Git 관련 문서는 다음 구조를 따른다.
 - 규칙을 바꾸면 변경 이유와 적용 범위를 함께 기록한다.
 - 문서 변경도 액션 단위 커밋으로 남긴다.
 
-## 9. 이 문서의 적용 범위
+## 11. 문서-코드 강제 ID 규칙
 
-이 파일은 저장소 루트의 기본 규칙이다. 하위 디렉터리에 더 구체적인 `AGENTS.md`가 있으면 해당 하위 범위에서는 하위 문서가 우선한다. 저장소의 실제 `CONTRIBUTING.md`, `BRANCHING.md`, `CODEOWNERS`, 보호 브랜치 설정이 이 문서와 다르면 더 구체적인 저장소 규칙을 따르고, 차이를 작업 결과에 기록한다.
+`docs/dev/` 파이프라인에서 아래 ID 연결은 강제(FORCED)다. 이름이 어긋나면 리뷰에서 반려한다. 자동 검증 스크립트는 아직 없고, 사람이 확인한다.
 
+- GitHub issue 번호 = `docs/dev/ADH/<issue-id>-<slug>/`, `docs/dev/NRF/<issue-id>-<slug>/` 폴더명
+- `docs/dev/NRF/<issue-id>-<slug>/plan/`에서 결정한 nfr-id = 코드 주석(`// NFR-<nfr-id>`)의 ID = `docs/dev/NRF/<issue-id>-<slug>/result/`의 파일명
+
+전체 파이프라인·다이어그램은 [`docs/dev/README.md`](docs/dev/README.md)를 따른다.
+
+## 12. 사용자 결정 자동 반영
+
+- 사용자가 "확정할게", "결정했다", "그렇게 진행해", "우선 제외"처럼 작업 방향을 결정하면, 그 발화를 현재 세션의 결정사항으로 간주하고 관련 문서를 변경 처리한다.
+- 결정 직후 터미널에서 생성·탐색한 근거를 다시 확인하고, 영향을 받는 가장 적절한 문서(결정 기록, README, `docs/dev/SAD.md`, 검증 보고서, 설정)를 업데이트한다.
+- 과거 실행 사실을 기록한 원본 로그·실패 기록은 소급해서 지우지 않고, 현재 결정과의 차이를 새 기록에 남긴다.
+- 결정이 요구사항이나 데이터 무결성과 충돌하면 조용히 덮어쓰지 말고 충돌 지점과 필요한 확인을 사용자에게 보고한다.
+- 최종 응답에는 결정으로 변경된 파일과 검증 결과를 명시한다 (7번 섹션의 완료 보고 형식 사용).
+
+## 13. 이 문서의 적용 범위
+
+이 파일은 저장소 루트의 기본 규칙이다. 하위 디렉터리에 더 구체적인 `AGENTS.md`가 있으면 해당 하위 범위에서는 하위 문서가 우선한다. 저장소의 실제 `CONTRIBUTING.md`, `BRANCHING.md`, `CODEOWNERS`, 보호 브랜치 설정이 이 문서와 다르면 더 구체적인 저장소 규칙을 따르고, 차이를 작업 결과에 기록한다. `docs/dev/README.md`, `docs/idea/README.md`가 이 문서보다 더 구체적인 경우 그 문서를 따른다.
