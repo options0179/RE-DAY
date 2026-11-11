@@ -1,13 +1,15 @@
 # RE:DAY 서비스 아키텍처 및 Agent 설정 추출
 
+> **SAD 운용 메모:** 이 문서는 구 `RE-DAY-architecture-agent.md`를 이전한 것으로, 지금부터 `docs/dev/` 파이프라인의 SAD(System Architecture Document) 역할을 한다. 갱신 시점은 harness로 강제되지 않고, `docs/dev/ADH/<issue-id>/ADR/`에 결정이 추가되면 같이 확인해야 하는 **graph engineering 관계**로만 정의된다. 자세한 파이프라인은 [`docs/dev/README.md`](README.md) 참조.
+
 > 대상 저장소: [options0179/RE-DAY](https://github.com/options0179/RE-DAY)  
 > 기준 브랜치: `main`  
 > 기준 트리: `0b6fcda2fb985111b2f6ec9ddb91cae504d5d7d1`  
 > 조사일: 2026-10-19
 >
-> **현재 상태 주의:** 아래 본문은 Copilot Studio 추출 당시의 기준 아키텍처다. 현재 Gemini 전환 결과와 코드 변경은 [`docs/agent/gemini-migration-decision.md`](docs/agent/gemini-migration-decision.md)와 [`docs/agent/implementation-gaps.md`](docs/agent/implementation-gaps.md)에 반영되어 있다.
+> **현재 상태 주의:** 아래 본문은 Copilot Studio 추출 당시의 기준 아키텍처다. 현재 Gemini 전환 결과와 코드 변경은 [`docs/dev/agent/gemini-migration-decision.md`](docs/dev/agent/gemini-migration-decision.md)와 [`docs/dev/agent/implementation-gaps.md`](docs/dev/agent/implementation-gaps.md)에 반영되어 있다.
 >
-> **문서 전용 브랜치 주의:** `feat/ai-agent`에서는 실행 코드와 배포 설정을 제거했다. 아래의 runtime 경로는 삭제 전 구조를 설명하는 역사적 기록이며, 현재 보존 대상은 문서와 [`docs/database-summary.md`](docs/database-summary.md)뿐이다.
+> **문서 전용 브랜치 주의:** `feat/ai-agent`에서는 실행 코드와 배포 설정을 제거했다. 아래의 runtime 경로는 삭제 전 구조를 설명하는 역사적 기록이며, 현재 보존 대상은 문서와 [`docs/dev/database-summary.md`](docs/dev/database-summary.md)뿐이다.
 
 ## 현재 Gemini 전환 델타
 
@@ -47,7 +49,7 @@ RE:DAY는 사용자가 관심 직무의 하루를 선택하고, 장면별로 직
 1. 저장소는 **하나의 Orchestrator Agent**를 전제로 한다. Multi-Agent Team은 향후 확장 대상으로만 언급된다.
 2. 실제 Copilot Studio의 **메인 시스템 프롬프트 원문과 Skill 정의 원문은 Git 저장소에 포함되어 있지 않다.** 저장소에는 그 Agent가 따라야 할 행동 계약과 백엔드 API가 있을 뿐이다.
 
-2026-10-19에 인증된 Copilot Studio 편집 화면을 읽기 전용으로 확인했다. 외부 Agent 원문은 [`docs/agent/`](docs/agent/)에 별도로 추출했다. 이 폴더에는 메인 안내의 두 연속 버전, 실제 설정된 Skill 9개, HTTP 도구, HRDKorea-MCP의 45개 활성 capability가 보존되어 있다.
+2026-10-19에 인증된 Copilot Studio 편집 화면을 읽기 전용으로 확인했다. 외부 Agent 원문은 [`docs/dev/agent/`](docs/dev/agent/)에 별도로 추출했다. 이 폴더에는 메인 안내의 두 연속 버전, 실제 설정된 Skill 9개, HTTP 도구, HRDKorea-MCP의 45개 활성 capability가 보존되어 있다.
 
 ## 2. Agent 원문 설정의 존재 여부
 
@@ -63,9 +65,9 @@ RE:DAY는 사용자가 관심 직무의 하루를 선택하고, 장면별로 직
 | Agent 식별자 | `cr9fa_reday_4T-Zrr` | [`frontend/app/copilot/page.tsx`](https://github.com/options0179/RE-DAY/blob/main/frontend/app/copilot/page.tsx) |
 | 별도 `SKILL.md` | 없음 | `main` 전체 파일 트리 조사 결과 |
 | 프롬프트 파일 | 없음 | `prompt`, `system`, `agent` 이름의 tracked 파일 없음 |
-| Copilot Studio 설정 원문 | Git에는 없음; 외부 편집 화면에서 별도 추출 완료 | [`docs/agent/`](docs/agent/) |
+| Copilot Studio 설정 원문 | Git에는 없음; 외부 편집 화면에서 별도 추출 완료 | [`docs/dev/agent/`](docs/dev/agent/) |
 
-Copilot Studio 설정 페이지는 저장소 외부 리소스다. 인증된 Agent 편집 화면에서 읽은 원문은 [`docs/agent/main-instructions.md`](docs/agent/main-instructions.md)와 [`docs/agent/skills/`](docs/agent/skills/)에 보존했다. 저장소에서 확인되는 운영 계약과 외부 화면의 설정은 [`docs/agent/implementation-gaps.md`](docs/agent/implementation-gaps.md)에서 비교한다.
+Copilot Studio 설정 페이지는 저장소 외부 리소스다. 인증된 Agent 편집 화면에서 읽은 원문은 [`docs/dev/agent/main-instructions.md`](docs/dev/agent/main-instructions.md)와 [`docs/dev/agent/skills/`](docs/dev/agent/skills/)에 보존했다. 저장소에서 확인되는 운영 계약과 외부 화면의 설정은 [`docs/dev/agent/implementation-gaps.md`](docs/dev/agent/implementation-gaps.md)에서 비교한다.
 
 ## 3. Agent 메인 프롬프트 추출 결과
 

@@ -1,6 +1,6 @@
 # RE:DAY 프론트엔드 ↔ 백엔드 계약 (완전 재설계)
 
-> 이 문서는 과거 구현(`docs/database-summary.md`, `RE-DAY-architecture-agent.md`에 기록된 Copilot Studio 시대 설계)을 승계하지 않고, 2026-10-26 Figma 와이어프레임(`jMF6hjDz1fidi66pkx9ZIP`)을 기준으로 완전히 새로 설계한 계약이다. 이름·컬렉션 구조·엔드포인트가 과거 문서와 다른 것은 의도된 것이다.
+> 이 문서는 과거 구현(`docs/dev/database-summary.md`, `docs/dev/SAD.md`에 기록된 Copilot Studio 시대 설계)을 승계하지 않고, 2026-10-26 Figma 와이어프레임(`jMF6hjDz1fidi66pkx9ZIP`)을 기준으로 완전히 새로 설계한 계약이다. 이름·컬렉션 구조·엔드포인트가 과거 문서와 다른 것은 의도된 것이다.
 
 ## 0. 설계 원칙
 

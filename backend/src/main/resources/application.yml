@@ -17,7 +17,7 @@ spring:
 reday:
   cors-origin: ${CORS_ORIGIN:http://localhost:3000}
   agent:
-    docs-dir: ${REDAY_AGENT_DOCS_DIR:../docs/agent}
+    docs-dir: ${REDAY_AGENT_DOCS_DIR:../docs/dev/agent}
   gemini:
     api-key: ${GEMINI_API_KEY:${gemini_api_key:}}
     model: ${GEMINI_MODEL:${gemini_model:gemini-flash-latest}}

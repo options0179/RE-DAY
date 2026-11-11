@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/** Port of backend/src/ai/prompt-catalog.ts — loads the extracted Copilot Agent instructions + skill prompts from docs/agent. */
+/** Port of backend/src/ai/prompt-catalog.ts — loads the extracted Copilot Agent instructions + skill prompts from docs/dev/agent. */
 @Component
 public class AgentPromptCatalog {
 

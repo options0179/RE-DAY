@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * Port of backend/src/ai/agent-orchestrator.ts#analyzeResponse. Given a job, the situation the
- * user faced, and their free-text response, asks Gemini (grounded in docs/agent's extracted
+ * user faced, and their free-text response, asks Gemini (grounded in docs/dev/agent's extracted
  * Copilot Agent instructions + skill prompts) to analyze the response and its in-world outcome.
  */
 @Service
