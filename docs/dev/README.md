@@ -21,8 +21,9 @@ docs/dev/
 ├── README.md        # 이 문서
 ├── SAD.md            # 시스템 아키텍처 (구 RE-DAY-architecture-agent.md)
 ├── agent/            # Copilot Studio 추출본 + 연결 계획 (구 docs/agent/, 코드가 런타임에 로드함)
-├── database-summary.md              # 과거 Firestore 계약 (보존)
-├── firebase-chat-memory-schema.md   # 과거 Firebase 채팅·기억 설계 (보존)
+├── archive/                         # 과거 아키텍처 기록 (현행 아님, 보존용)
+│   ├── database-summary.md          #   과거 Firestore 계약
+│   └── firebase-chat-memory-schema.md  # 과거 Firebase 채팅·기억 설계
 ├── frontend-backend-contract.md     # 현행 API 계약
 ├── env.md                           # 환경변수
 ├── ADH/

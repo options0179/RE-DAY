@@ -137,5 +137,5 @@ cd frontend && npm install && npm run dev
 
 - README·코드·이 문서는 현재 `backend/` Java 소스 및 `frontend/` React 소스를 기준으로 합니다.
 - `docs/dev/agent/`는 기존 Copilot Agent 설정에서 보존한 원문/지침 문서입니다. 이것이 Copilot 런타임이 실행 중이라는 뜻은 아닙니다.
-- `docs/dev/database-summary.md`, `docs/dev/firebase-chat-memory-schema.md`, `docs/dev/agent/copilot-studio-api-connect-phase*.md` 및 `docs/dev/agent/migration-progress.md` 등은 과거 아키텍처나 전환 기록을 보존합니다. 이 문서의 Firebase/Firestore, Next.js, Node/Express, MCP 설명을 현재 실행 구성으로 해석하지 마세요.
+- `docs/dev/archive/database-summary.md`, `docs/dev/archive/firebase-chat-memory-schema.md`, `docs/dev/agent/copilot-studio-api-connect-phase*.md` 및 `docs/dev/agent/migration-progress.md` 등은 과거 아키텍처나 전환 기록을 보존합니다. 이 문서의 Firebase/Firestore, Next.js, Node/Express, MCP 설명을 현재 실행 구성으로 해석하지 마세요.
 - 현재 backend의 테스트는 `backend/src/test/`에 있습니다. 프런트엔드에는 별도 test script가 정의되어 있지 않습니다.
