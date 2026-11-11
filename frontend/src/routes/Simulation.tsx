@@ -38,6 +38,7 @@ export default function Simulation() {
     setDraftText(value);
     if (!session) return;
     if (draftSaveTimer.current) clearTimeout(draftSaveTimer.current);
+    // Draft persistence is best-effort; the explicit step submission remains the authoritative write.
     draftSaveTimer.current = setTimeout(() => {
       api.sessions.saveDraft(session.id, value).catch(() => {});
     }, 600);

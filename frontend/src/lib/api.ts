@@ -37,6 +37,7 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  // Keep token injection and API error parsing in one place so route components handle domain data only.
   const token = getToken();
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;

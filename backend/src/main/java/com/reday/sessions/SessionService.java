@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Coordinates session state transitions; controllers stay limited to HTTP mapping. */
 @Service
 public class SessionService {
 
@@ -95,6 +96,7 @@ public class SessionService {
   public StepView submitStep(Long userId, String sessionId, SubmitStepRequest request) {
     ExperienceSession session = requireOwned(userId, sessionId);
 
+    // Reject stale submissions before spending time on Gemini or writing a second copy of a step.
     if (session.getStateVersion() != request.expectedStateVersion()) {
       StepView latest = stepRepository.findBySessionIdAndStepIndex(sessionId, session.getCurrentStepIndex() - 1)
           .map(step -> toStepView(step, session))
@@ -113,6 +115,7 @@ public class SessionService {
     JobVariant variant = jobService.getVariant(session.getVariantId());
     SituationTemplate template = variant.getSituationTemplates().get(session.getCurrentStepIndex());
 
+    // Analyze before persisting so a failed model response cannot leave a half-written step.
     SceneAnalysisResult result = sceneAnalysisService.analyze(job.getName(), template.getNarrative(), request.responseText());
 
     ExperienceStep step = new ExperienceStep();
@@ -145,6 +148,7 @@ public class SessionService {
       throw ApiException.badRequest("toStepIndex가 유효한 범위를 벗어났습니다");
     }
 
+    // Preserve the original history; the new session copies only steps before the chosen restart point.
     ExperienceSession branch = new ExperienceSession();
     branch.setId(UUID.randomUUID().toString());
     branch.setOwnerId(userId);
@@ -206,6 +210,7 @@ public class SessionService {
 
     ExperienceSummary summary = new ExperienceSummary();
     summary.setSessionId(sessionId);
+    // MVP reflection is derived from saved evidence; it does not make a second Gemini call.
     summary.setTimelineSummary(steps.stream()
         .map(step -> (step.getStepIndex() + 1) + ". " + step.getSituationTitle() + " — " + step.getCharacterReaction())
         .collect(Collectors.joining("\n")));
@@ -260,6 +265,7 @@ public class SessionService {
     ExperienceSession session = sessionRepository.findById(sessionId)
         .orElseThrow(() -> ApiException.notFound("세션을 찾을 수 없습니다"));
     if (!session.getOwnerId().equals(userId)) {
+      // Use the same response for missing and foreign sessions so callers cannot enumerate IDs.
       throw ApiException.notFound("세션을 찾을 수 없습니다");
     }
     return session;

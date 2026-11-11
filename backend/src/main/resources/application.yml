@@ -5,6 +5,7 @@ spring:
   application:
     name: re-day-backend
   datasource:
+    # Local/MVP storage only; restarting the process clears users, sessions, and history.
     url: jdbc:h2:mem:reday;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
   jpa:

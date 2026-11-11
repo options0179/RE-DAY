@@ -38,6 +38,7 @@ public class AuthService {
     user.setDisplayName(request.displayName());
     user = userRepository.save(user);
 
+    // The token is returned to the local/MVP client because no mail delivery provider is configured.
     String token = UUID.randomUUID().toString();
     verificationTokenRepository.save(new EmailVerificationToken(token, user.getId()));
     return new SignupResponse(user.getId(), token);

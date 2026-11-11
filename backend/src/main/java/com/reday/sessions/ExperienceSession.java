@@ -36,6 +36,7 @@ public class ExperienceSession {
   @Column(length = 2000)
   private String draftResponse;
 
+  // Client-visible stale-write token, checked by SessionService; JPA does not use @Version locking here.
   private int stateVersion = 1;
 
   private String parentSessionId;

@@ -19,6 +19,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
   @Override
   public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
       NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+    // AuthInterceptor resolves the bearer token first; only endpoints declaring @CurrentUserId require it.
     HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
     Object userId = request == null ? null : request.getAttribute(AuthInterceptor.USER_ID_ATTRIBUTE);
     if (userId == null) {
