@@ -161,9 +161,10 @@ git status --short --branch
 - 커밋 전에 staged diff를 반드시 확인한다.
 - 작업하지 않은 사용자 변경을 `add`, 수정, 삭제, reset하지 않는다.
 - 관련 없는 포맷팅이나 자동 생성 파일을 섞지 않는다.
-- 커밋 메시지는 명령형·현재형으로 짧게 쓴다.
-- 기본 형식은 `<type>: <action>`이다.
-- 문서만 변경하면 `docs: ...`, 브랜치 정책 문서 추가는 `docs: add agent workflow rules`처럼 쓴다.
+- 커밋 메시지는 짧고 간결한 한국어로 쓴다.
+- 기본 형식은 `<type>: <한국어 설명>`이다. type 접두어는 영어 그대로 쓴다.
+- 본문(body)도 한국어로 쓴다. 코드 식별자, 파일 경로, 명령어, 고유명사처럼 원래 영어인 표현은 번역하지 않고 그대로 둔다.
+- 문서만 변경하면 `docs: ...`, 브랜치 정책 문서 추가는 `docs: 에이전트 작업 규칙 추가`처럼 쓴다.
 - 같은 액션을 고치기 위한 후속 커밋은 허용한다. 기존 커밋을 임의로 amend하거나 squash하지 않는다.
 - 사용자가 요청하지 않은 force push, remote branch 삭제, 커밋 재작성은 하지 않는다.
 - 작업과 관련된 문서(ADR, NRF plan/result 등)도 커밋 대상에 포함한다. 문서라는 이유로 커밋에서 제외하지 않는다.
@@ -171,10 +172,10 @@ git status --short --branch
 예시:
 
 ```text
-docs: add agent workflow rules
-feat: persist copilot conversation context
-test: cover stale simulation writes
-fix: reject cross-user session access
+docs: 에이전트 작업 규칙 추가
+feat: Copilot 대화 컨텍스트 저장
+test: 오래된 시뮬레이션 쓰기 검증 추가
+fix: 다른 사용자의 세션 접근 차단
 ```
 
 ### 액션 분할 예시
@@ -182,11 +183,11 @@ fix: reject cross-user session access
 큰 작업은 다음처럼 분리한다.
 
 ```text
-1. docs: document current architecture
-2. docs: add agent workflow rules
-3. feat: add session persistence endpoint
-4. test: cover session ownership and version conflicts
-5. fix: handle failed completion persistence
+1. docs: 현재 아키텍처 문서화
+2. docs: 에이전트 작업 규칙 추가
+3. feat: 세션 저장 엔드포인트 추가
+4. test: 세션 소유권과 버전 충돌 검증 추가
+5. fix: 완료 저장 실패 처리
 ```
 
 각 커밋은 가능하면 독립적으로 빌드·검토·되돌릴 수 있어야 한다. 단, 동작을 완성하기 위해 소스와 테스트가 반드시 함께 바뀌어야 하면 하나의 액션 커밋에 함께 포함한다.
