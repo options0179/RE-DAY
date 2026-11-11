@@ -26,7 +26,7 @@ Spring Boot + Java 21 (:4000)
 | `docs/dev/agent/` | 추출된 Agent 지침과 Skill 프롬프트. 실행 시 백엔드가 읽음 |
 | `docs/` | 시스템 구조, 프런트엔드-백엔드 계약, 환경·개발 프로세스 문서 |
 
-상세 아키텍처는 [`docs/dev/SAD.md`](docs/dev/SAD.md), 엔드포인트와 현재 구현 차이는 [`docs/frontend-backend-contract.md`](docs/frontend-backend-contract.md)를 참고하세요.
+상세 아키텍처는 [`docs/dev/SAD.md`](docs/dev/SAD.md), 엔드포인트와 현재 구현 차이는 [`docs/dev/frontend-backend-contract.md`](docs/dev/frontend-backend-contract.md)를 참고하세요.
 
 ## 로컬 실행
 
@@ -71,7 +71,7 @@ npm run dev
 
 1. 이 README에서 실행 방법과 현재 범위를 확인합니다.
 2. [`docs/dev/SAD.md`](docs/dev/SAD.md)에서 컴포넌트, 데이터 모델, 요청 흐름을 봅니다.
-3. [`docs/frontend-backend-contract.md`](docs/frontend-backend-contract.md)에서 API 계약과 계획 대비 구현 차이를 확인합니다.
+3. [`docs/dev/frontend-backend-contract.md`](docs/dev/frontend-backend-contract.md)에서 API 계약과 계획 대비 구현 차이를 확인합니다.
 4. 코드 수정 전 [`AGENTS.md`](AGENTS.md)와 [`docs/dev/README.md`](docs/dev/README.md)의 작업·문서 파이프라인 규칙을 따릅니다.
 
 > `docs/dev/agent/`의 Copilot 추출 문서는 프롬프트 내용의 출처입니다. README 및 일부 과거 문서는 예전 Node/Next.js/Firebase 아키텍처를 설명하므로, 실행 구조를 파악할 때는 이 문서와 현재 Java·React 소스를 기준으로 하세요.

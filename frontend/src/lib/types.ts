@@ -1,4 +1,4 @@
-// Mirrors backend/src/main/java/com/reday/**/dto — see docs/frontend-backend-contract.md.
+// Mirrors backend/src/main/java/com/reday/**/dto — see docs/dev/frontend-backend-contract.md.
 
 export interface UserView {
   id: number;

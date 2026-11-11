@@ -24,6 +24,7 @@
 - [implementation-gaps.md](./implementation-gaps.md): 기존 코드와 Agent 사이의 미연결·품질 문제
 - [process-improvement.md](./process-improvement.md): 이번 작업이 지연된 원인과 변경한 진행 방식
 - [migration-progress.md](./migration-progress.md): 요청한 10개 전환 작업의 완료·보류 상태
+- [copilot-studio-api-connect-phase1.md](./copilot-studio-api-connect-phase1.md), [phase2](./copilot-studio-api-connect-phase2.md): Copilot Studio에서 백엔드 HTTP action을 연결하려던 계획 (과거 기록)
 
 ## 현재 Gemini 전환 구현
 

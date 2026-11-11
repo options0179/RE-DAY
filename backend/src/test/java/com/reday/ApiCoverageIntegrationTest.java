@@ -22,7 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 /**
- * Exercises every endpoint in docs/frontend-backend-contract.md over real HTTP (not the service
+ * Exercises every endpoint in docs/dev/frontend-backend-contract.md over real HTTP (not the service
  * layer) — routing, status codes, auth, and JSON shapes all go through the actual Spring MVC
  * stack. SceneAnalysisService is mocked so this never depends on the live, occasionally slow
  * Gemini API; GeminiClient/prompt-loading wiring is still exercised indirectly by

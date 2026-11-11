@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Fixture job/variant data, standing in for the external job-grounding source the old
- * Copilot-era MCP integration used to provide (dropped — see docs/frontend-backend-contract.md
+ * Copilot-era MCP integration used to provide (dropped — see docs/dev/frontend-backend-contract.md
  * §6, nothing in the new contract calls out to HRDKorea). Variants intentionally carry different
  * numbers of situationTemplates so totalSteps is visibly not a constant.
  */

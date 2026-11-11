@@ -107,6 +107,6 @@
 
 - `backend/src/mcp/gateway.ts`는 `McpGateway`라는 내부 호출 추상화이며, MCP SDK transport/server 구현은 아니다.
 - `@modelcontextprotocol/sdk`는 source import가 없어서 backend manifest와 lock에서 제거했다. 실제 MCP transport를 추가할 때 별도 action으로 다시 도입한다.
-- `docs/copilot-studio-api-connect-phase1.md`와 `docs/copilot-studio-openapi.json`은 Copilot Studio에서 RE-DAY backend HTTP action을 연결하려던 흔적이다.
+- `copilot-studio-api-connect-phase1.md`는 Copilot Studio에서 RE-DAY backend HTTP action을 연결하려던 흔적이다.
 - OpenAPI action 이름은 `RE_DAY_StartDay`, `RE_DAY_CompleteDay`, `RE_DAY_GetContext`, `RE_DAY_SaveSummary`, `RE_DAY_SaveMemoryCandidate`이다.
 - Gemini 전환에서는 MCP 전체 권한을 그대로 노출하지 말고 필요한 도구 allowlist와 사용자 데이터 범위를 먼저 정의해야 한다.

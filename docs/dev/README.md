@@ -20,8 +20,11 @@ GitHub Issue가 생긴 이후 — 설계(ADR/SAD)부터 TDD 개발(NRF)까지의
 docs/dev/
 ├── README.md        # 이 문서
 ├── SAD.md            # 시스템 아키텍처 (구 RE-DAY-architecture-agent.md)
-├── agent/            # Copilot Studio 추출본 (구 docs/agent/, 코드가 런타임에 로드함)
-├── database-summary.md
+├── agent/            # Copilot Studio 추출본 + 연결 계획 (구 docs/agent/, 코드가 런타임에 로드함)
+├── database-summary.md              # 과거 Firestore 계약 (보존)
+├── firebase-chat-memory-schema.md   # 과거 Firebase 채팅·기억 설계 (보존)
+├── frontend-backend-contract.md     # 현행 API 계약
+├── env.md                           # 환경변수
 ├── ADH/
 │   └── TEMPLATE/ADR/TEMPLATE.md     # 실제 사용 시 TEMPLATE → <issue-id>-<slug>
 └── NRF/
@@ -41,8 +44,8 @@ flowchart TD
     CONFIRM --> ISSUE["GitHub Issue 생성<br/>도메인 tag + issue 번호"]:::forced
 
     ISSUE -->|"[FORCED][ID] issue 번호 = 폴더명"| BRANCH["브랜치: type/&lt;issue-id&gt;-slug<br/>(AGENTS.md)"]:::forced
-    ISSUE -->|"[FORCED][ID] issue 번호 = 폴더명"| ADHDIR["docs/dev/ADH/&lt;issue-id&gt;/"]:::forced
-    ISSUE -->|"[FORCED][ID] issue 번호 = 폴더명"| NRFDIR["docs/dev/NRF/&lt;issue-id&gt;/"]:::forced
+    ISSUE -->|"[FORCED][ID] issue 번호 = 폴더명"| ADHDIR["docs/dev/ADH/&lt;issue-id&gt;-&lt;slug&gt;/"]:::forced
+    ISSUE -->|"[FORCED][ID] issue 번호 = 폴더명"| NRFDIR["docs/dev/NRF/&lt;issue-id&gt;-&lt;slug&gt;/"]:::forced
 
     ADHDIR --> ADR["ADR/0001...<br/>(순차 ID, FORCED)"]:::forced
     NRFDIR --> NRFPLAN["plan/&lt;nfr-id&gt;-plan.md"]:::forced
@@ -64,11 +67,11 @@ flowchart TD
 
     IDEA[아이디어] --> PLAN[docs/idea/plans]
     PLAN --> ISSUE[GitHub Issue]
-    ISSUE --> ADR[ADH/&lt;issue-id&gt;/ADR]
+    ISSUE --> ADR[ADH/&lt;issue-id&gt;-&lt;slug&gt;/ADR]
     ADR -->|"관계: 결정이 생기면 SAD도 같이 봐야 함<br/>(자동화 아님, 설계상 의존관계)"| SAD[docs/dev/SAD.md]:::graphRel
-    ISSUE --> NRFP[NRF/&lt;issue-id&gt;/plan]
+    ISSUE --> NRFP[NRF/&lt;issue-id&gt;-&lt;slug&gt;/plan]
     NRFP --> CODE[TDD 코드 + NFR ID 주석]
-    CODE --> NRFR[NRF/&lt;issue-id&gt;/result]
+    CODE --> NRFR[NRF/&lt;issue-id&gt;-&lt;slug&gt;/result]
 
     PLAN --> HISTORY
     ADR --> HISTORY
@@ -103,7 +106,7 @@ flowchart TD
     subgraph P2["② 이슈·설계"]
         S5["GitHub Issue 생성<br/>도메인 tag"]:::forced
         S6["브랜치: type/&lt;issue-id&gt;-slug<br/>(AGENTS.md)"]:::forced
-        S7["docs/dev/ADH/&lt;issue-id&gt;/ADR/<br/>(issue-id=폴더명)"]:::forced
+        S7["docs/dev/ADH/&lt;issue-id&gt;-&lt;slug&gt;/ADR/<br/>(issue-id=폴더명)"]:::forced
         RAG1["[AI] RAG: ADR 작성 착수 시<br/>관련 과거 ADR·SAD 컨텍스트 주입<br/>(미구현)"]:::ai
         S8["ADR 작성<br/>(skill:: write-ADR)"]
         S9["SAD.md 갱신<br/>(그래프 관계, 자동화 아님)"]:::graphRel
@@ -114,11 +117,11 @@ flowchart TD
     end
 
     subgraph P3["③ 개발"]
-        S10["docs/dev/NRF/&lt;issue-id&gt;/plan/<br/>(TDD 직전, issue-id=폴더명)"]:::forced
+        S10["docs/dev/NRF/&lt;issue-id&gt;-&lt;slug&gt;/plan/<br/>(TDD 직전, issue-id=폴더명)"]:::forced
         RAG2["[AI] RAG: NRF plan 작성 착수 시<br/>관련 과거 NFR plan·ADR 컨텍스트 주입<br/>(미구현)"]:::ai
         S11["TDD 코드 작성<br/>주석에 nfr-id 기록"]:::forced
         RAG3["[AI] RAG: 코드 작성 착수 시<br/>해당 nfr-id plan·관련 ADR 컨텍스트 주입<br/>(미구현)"]:::ai
-        S12["docs/dev/NRF/&lt;issue-id&gt;/result/<br/>(같은 nfr-id)"]:::forced
+        S12["docs/dev/NRF/&lt;issue-id&gt;-&lt;slug&gt;/result/<br/>(같은 nfr-id)"]:::forced
         S9 --> S10
         RAG2 --> S10
         S10 --> S11

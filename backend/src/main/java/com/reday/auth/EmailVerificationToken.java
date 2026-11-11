@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Stands in for a real "click the link in your email" flow — see docs/frontend-backend-contract.md §6. */
+/** Stands in for a real "click the link in your email" flow — see docs/dev/frontend-backend-contract.md §6. */
 @Entity
 @Table(name = "email_verification_tokens")
 @Getter

@@ -9,7 +9,7 @@ import lombok.Setter;
 /**
  * One fixed "상황 대응" step a variant presents, in order. The number of templates IS the
  * session's totalSteps — different variants have different counts, so progress ("N / M") is
- * never a hardcoded constant. See docs/frontend-backend-contract.md §5.
+ * never a hardcoded constant. See docs/dev/frontend-backend-contract.md §5.
  */
 @Embeddable
 @Getter
