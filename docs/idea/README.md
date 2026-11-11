@@ -6,7 +6,7 @@
 
 - `docs/idea/plans/<slug>.md`는 frontmatter에 `status: unconfirmed` 또는 `status: confirmed`를 가진다.
 - `unconfirmed → confirmed`는 **사람이 직접 전환**한다. 체크리스트 자동 검사나 Discord 자동 멘션 같은 게이트는 없다.
-- `confirmed`가 되면 GitHub Issue를 만들고(도메인 tag 부여), 이후 작업은 `docs/dev/ADH/<issue-id>/`와 `docs/dev/NRF/<issue-id>/`로 넘어간다 — 자세한 흐름은 [`docs/dev/README.md`](../dev/README.md) 참조.
+- `confirmed`가 되면 GitHub Issue를 만들고(도메인 tag 부여), 이후 작업은 `docs/dev/ADH/<issue-id>-<slug>/`와 `docs/dev/NRF/<issue-id>-<slug>/`로 넘어간다 — 자세한 흐름은 [`docs/dev/README.md`](../dev/README.md) 참조.
 
 ## 향후 자동화 (미구현)
 
