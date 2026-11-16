@@ -12,7 +12,7 @@
 
 ### 1.2 추출 계약 없이 UI를 반복 탐색함
 
-처음에는 “서비스 아키텍처”, “Agent 설정”, “Skill”, “MCP”, “Gemini 전환”, “코드 리팩터링”이 한 범위로 섞여 있었다. 메인 안내의 두 버전, 실제 Skill 9개, MCP 도구 권한과 연결 상태를 각각 원문·목록·불일치·보안 제외 규칙으로 나누는 기준이 늦게 확정됐다. 현재는 그 결과가 `agent-manifest.md:15-30`, `main-instructions.md`, `mcp.md`로 분리돼 있다.
+처음에는 “서비스 아키텍처”, “Agent 설정”, “Skill”, “MCP”, “Gemini 전환”, “코드 리팩터링”이 한 범위로 섞여 있었다. 메인 안내의 두 버전, 실제 Skill 9개, MCP 도구 권한과 연결 상태를 각각 원문·목록·불일치·보안 제외 규칙으로 나누는 기준이 늦게 확정됐다. 당시 정리 결과는 `agent-manifest.md:15-30`, [`../../agent/main-instructions.md`](../../agent/main-instructions.md), `mcp.md`에 남아 있다.
 
 ### 1.3 문서 추출과 코드 전환의 의존 순서가 뒤섞임
 

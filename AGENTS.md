@@ -47,6 +47,14 @@ rg -n -i "branch|branching|commit|pull request|merge|release|workflow|codeowners
 
 **읽기 원칙**: 모든 규칙 문서를 한 번에 읽지 않는다. 현재 작업 단계에 필요한 문서만 읽는다. 관련 없는 다른 issue의 완료된 `docs/dev/ADH/*/ADR`, 다른 issue의 `docs/dev/NRF/*`를 선제적으로 읽지 않는다. 작업 단계가 바뀌면 그때 필요한 문서를 추가로 읽는다.
 
+프로젝트 문서 탐색이 요청되었거나 `docs/`의 내용·구조를 검토하거나 변경할 때는 개별 프로젝트 문서보다 먼저 저장소 루트의 문서 안내서를 읽는다.
+
+```bash
+cat PROJECT-DOCUMENTS.md
+```
+
+안내서에서 관련 문서의 역할과 읽기 순서를 확인한 뒤, 해당 작업에 필요한 문서만 실제로 연다. `rg --files docs`로 파일을 찾는 것만으로 문서 내용을 읽었다고 간주하지 않는다. 코드·문서 작업에서 프로젝트 문서 탐색이 별도 요청된 경우에도 이 순서를 적용한다.
+
 ## 2. 문서-개발 파이프라인 확인
 
 코드를 바꾸기 전에, 이 작업이 `docs/idea/` → GitHub Issue → `docs/dev/ADH/` · `docs/dev/NRF/` 파이프라인의 어느 단계에 있는지 확인한다.
@@ -315,7 +323,7 @@ Git 관련 문서는 다음 구조를 따른다.
 - GitHub issue 번호 = `docs/dev/ADH/<issue-id>-<slug>/`, `docs/dev/NRF/<issue-id>-<slug>/` 폴더명
 - `docs/dev/NRF/<issue-id>-<slug>/plan/`에서 결정한 nfr-id = 코드 주석(`// NFR-<nfr-id>`)의 ID = `docs/dev/NRF/<issue-id>-<slug>/result/`의 파일명
 
-전체 파이프라인·다이어그램은 [`docs/dev/README.md`](docs/dev/README.md)를 따른다.
+전체 파이프라인·다이어그램은 [`docs/dev/README.md`](docs/dev/README.md)를 따른다. 프로젝트 문서의 역할과 탐색 순서는 작업 전에 [`PROJECT-DOCUMENTS.md`](PROJECT-DOCUMENTS.md)를 읽는다.
 
 ## 12. 사용자 결정 자동 반영
 

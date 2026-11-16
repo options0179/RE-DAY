@@ -1,10 +1,10 @@
 # RE:DAY 시스템 아키텍처
 
-> 이 문서는 현재 체크아웃의 Java/Spring Boot + React/Vite 구현을 기준으로 역문서화한다. 과거 Node/Next.js, Firebase/Firestore, Copilot Studio 및 MCP 설계는 현재 런타임 설명이 아니다. AI Agent 원본 추출과 이전 마이그레이션 기록은 [`agent/`](agent/)에 남아 있다.
+> 이 문서는 현재 체크아웃의 Java/Spring Boot + React/Vite 구현을 기준으로 역문서화한다. 과거 Node/Next.js, Firebase/Firestore, Copilot Studio 및 MCP 설계는 현재 런타임 설명이 아니다. 제품 요구, 제품 가설, Agent 행동 원칙은 각각 [`../product/requirements.md`](../product/requirements.md), [`../product/discovery.md`](../product/discovery.md), [`../agent/behavior.md`](../agent/behavior.md)에서 관리하며 이 문서에는 구현된 구조만 기록한다.
 
 ## 목적과 범위
 
-RE:DAY는 직무 상황에 대한 사용자의 응답을 저장하고, 행동 근거를 분석해 가상의 인물 반응과 함께 돌려주는 웹 서비스다. 이 문서는 현재 코드에 구현된 구성, 요청 경계, 데이터 상태를 설명한다. 배포 인프라나 아직 연결되지 않은 외부 서비스는 구현된 것처럼 다루지 않는다.
+RE:DAY는 사용자가 직무 상황을 체험하고 선택의 결과를 확인하는 웹 서비스다. 이 문서는 현재 코드에 구현된 구성, 요청 경계, 데이터 상태만 설명한다. 사용자 문제·기능 우선순위·검증 가설은 제품 문서에, Agent의 사용자 대면 행동 원칙은 Agent 행동 명세에 둔다. 배포 인프라나 아직 연결되지 않은 외부 서비스는 구현된 것처럼 다루지 않는다.
 
 ## 런타임 구성
 
@@ -13,7 +13,7 @@ flowchart LR
   Browser[React + TypeScript<br/>Vite :3000]
   API[Spring Boot<br/>Java 21 :4000]
   DB[(H2 in-memory<br/>JPA entities)]
-  Prompt[docs/dev/agent<br/>Markdown prompts]
+  Prompt[docs/dev/agent<br/>Active Markdown prompts]
   Gemini[Gemini Developer API]
 
   Browser -->|REST JSON + Bearer token| API
@@ -133,9 +133,10 @@ cd backend && mvn spring-boot:run
 cd frontend && npm install && npm run dev
 ```
 
-## 현재 범위와 제외된 과거 설계
+## 문서 경계와 과거 설계
 
 - README·코드·이 문서는 현재 `backend/` Java 소스 및 `frontend/` React 소스를 기준으로 합니다.
-- `docs/dev/agent/`는 기존 Copilot Agent 설정에서 보존한 원문/지침 문서입니다. 이것이 Copilot 런타임이 실행 중이라는 뜻은 아닙니다.
-- `docs/dev/archive/database-summary.md`, `docs/dev/archive/firebase-chat-memory-schema.md`, `docs/dev/agent/copilot-studio-api-connect-phase*.md` 및 `docs/dev/agent/migration-progress.md` 등은 과거 아키텍처나 전환 기록을 보존합니다. 이 문서의 Firebase/Firestore, Next.js, Node/Express, MCP 설명을 현재 실행 구성으로 해석하지 마세요.
+- `docs/dev/agent/`에는 현재 코드가 실제로 읽는 `main-instructions.md`와 `skills/*.md`만 둡니다. 코드 실행이 Agent 행동 명세 문서를 직접 읽는다는 뜻은 아닙니다.
+- 제품 요구·발견 가설·Agent 행동 명세는 구현 여부를 설명하지 않습니다. 구현 상태와 아키텍처의 기준은 현재 코드와 이 SAD입니다.
+- `docs/dev/archive/`는 과거 설계·마이그레이션 기록을 보존합니다. 그 안의 Firebase/Firestore, Next.js, Node/Express, Copilot Studio 및 MCP 설명은 현행 런타임으로 해석하지 마세요.
 - 현재 backend의 테스트는 `backend/src/test/`에 있습니다. 프런트엔드에는 별도 test script가 정의되어 있지 않습니다.

@@ -18,18 +18,21 @@ GitHub Issue가 생긴 이후 — 설계(ADR/SAD)부터 TDD 개발(NRF)까지의
 
 ```text
 docs/dev/
-├── README.md        # 이 문서
-├── SAD.md            # 시스템 아키텍처 (구 RE-DAY-architecture-agent.md)
-├── agent/            # Copilot Studio 추출본 + 연결 계획 (구 docs/agent/, 코드가 런타임에 로드함)
-├── archive/                         # 과거 아키텍처 기록 (현행 아님, 보존용)
-│   ├── database-summary.md          #   과거 Firestore 계약
-│   └── firebase-chat-memory-schema.md  # 과거 Firebase 채팅·기억 설계
-├── frontend-backend-contract.md     # 현행 API 계약
-├── env.md                           # 환경변수
+├── README.md          # 이 문서
+├── SAD.md             # 현행 구현의 시스템 구조 요약
+├── frontend-backend-contract.md  # 프런트엔드 ↔ 백엔드 API 계약
+├── env.md             # 환경변수와 로컬 실행 안내
+├── agent/             # 코드가 런타임에 읽는 활성 Agent 지침·Skill
+├── archive/           # 현행 기준이 아닌 과거 설계·마이그레이션 기록
+│   ├── agent/          # 과거 Copilot/MCP/Gemini 전환 기록
+│   ├── database-summary.md
+│   └── firebase-chat-memory-schema.md
 ├── ADH/
 │   └── TEMPLATE/ADR/TEMPLATE.md     # 실제 사용 시 TEMPLATE → <issue-id>-<slug>
 └── NRF/
     └── TEMPLATE/{plan,result}/TEMPLATE.md
+
+제품 요구와 제품 검증 가설은 `docs/product/`, 사용자 대면 Agent 원칙은 `docs/agent/`에서 관리한다. 저장소 문서의 전체 역할과 탐색 순서는 루트 [`PROJECT-DOCUMENTS.md`](../../PROJECT-DOCUMENTS.md)를 먼저 읽는다.
 ```
 
 issue가 생기면 `ADH/TEMPLATE/`, `NRF/TEMPLATE/`를 `<issue-id>-<slug>/`로 복사해서 쓴다. `TEMPLATE`라는 이름 그대로는 실제 작업에 쓰지 않는다.
